@@ -39,6 +39,7 @@ pub struct GroupManagerCertificate {
     #[max_len(8, 8)]
     pub promo_code: Vec<u8>,
     pub owner: Pubkey,
+    pub num_order: u8,
     pub activated: bool,
 }
 
@@ -53,6 +54,16 @@ pub struct GroupOrder {
     pub start_time: u64,
     pub expired_time: u64,
     pub price: u64,
+    pub num_order: u8,
+    pub bump: u8,
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct GroupRequest {
+    pub buyer: Pubkey,
+    pub group_order: Pubkey,
+    pub amount: u64,
     pub bump: u8,
 }
 

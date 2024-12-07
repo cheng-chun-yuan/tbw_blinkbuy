@@ -32,7 +32,7 @@ pub struct CreateGroupOrder<'info> {
         init,
         payer = owner,
         space = 8 + GroupOrder::INIT_SPACE,
-        seeds = [b"store", owner.key().as_ref()],
+        seeds = [b"group_order", owner.key().as_ref(), group_manager_certificate.num_order.to_le_bytes().as_ref()],
         bump
     )]
     pub group_order: Account<'info, GroupOrder>,
@@ -42,6 +42,7 @@ pub struct CreateGroupOrder<'info> {
 impl CreateGroupOrder<'_> {
     pub fn create_group_order(&mut self, manager_refund: u64, start_time: u64, expired_time: u64, price: u64, bumps: &CreateGroupOrderBumps) -> Result<()> {
         self.group_order.set_inner( GroupOrder {
+            num_order: self.group_manager_certificate.num_order,
             group_manager: self.owner.key(),
             price_requirement: self.price_requirement.key(),
             group_manager_certificate: self.group_manager_certificate.key(),
@@ -52,6 +53,7 @@ impl CreateGroupOrder<'_> {
             price,
             bump: bumps.group_order,
         });
+        self.group_manager_certificate.num_order += 1;
         Ok(())
     }
 }

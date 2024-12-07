@@ -2,14 +2,17 @@ use anchor_lang::prelude::*;
 
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token_interface::{transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked},
+    token_interface::{
+        close_account, transfer_checked, CloseAccount, Mint, TokenAccount, TokenInterface,
+        TransferChecked,
+    },
 };
 
 use crate::GroupOrder;
 use crate::GroupRequest;
 
 #[derive(Accounts)]
-pub struct BuyProduct<'info> {
+pub struct CancelRequest<'info> {
     #[account(mut)]
     pub buyer: Signer<'info>,
     #[account(mut)]
@@ -29,17 +32,16 @@ pub struct BuyProduct<'info> {
     )]
     pub buyer_ata: Box<InterfaceAccount<'info, TokenAccount>>,
     #[account(
-        init,
-        payer = buyer,
+        mut,
         associated_token::mint = mint,
         associated_token::authority = group_request,
         associated_token::token_program = token_program,
     )]
     pub vault_request: Box<InterfaceAccount<'info, TokenAccount>>,
     #[account(
-        init,
-        payer = buyer,
-        space = 8 + GroupRequest::INIT_SPACE,
+        mut,
+        close = buyer,
+        has_one = buyer,
         seeds = [b"group_request", group_order.key().as_ref()],
         bump
     )]
@@ -49,24 +51,40 @@ pub struct BuyProduct<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl BuyProduct<'_> {
-    pub fn buy_product(&mut self, amount: u64, bumps: &BuyProductBumps) -> Result<()> {
-        self.group_request.set_inner( GroupRequest {
-            buyer: self.buyer.key(),
-            group_order: self.group_order.key(),
-            amount,
-            bump: bumps.group_request,
-        });
+impl CancelRequest<'_> {
+    pub fn cancel_request(&mut self, amount: u64) -> Result<()> {
         let total_amount = self.group_order.price * amount;
+        let signer_seeds: [&[&[u8]]; 1] = [&[
+            b"group_request",
+            self.group_order.to_account_info().key.as_ref(),
+            &[self.group_request.bump],
+        ]];
         let transfer_accounts = TransferChecked {
-            from: self.buyer_ata.to_account_info(),
+            from: self.vault_request.to_account_info(),
             mint: self.mint.to_account_info(),
-            to: self.vault_request.to_account_info(),
-            authority: self.buyer.to_account_info(),
+            to: self.buyer_ata.to_account_info(),
+            authority: self.group_request.to_account_info(),
         };
 
-        let cpi_ctx = CpiContext::new(self.token_program.to_account_info(), transfer_accounts);
-        transfer_checked(cpi_ctx, total_amount, self.mint.decimals);
-        Ok(())
+        let cpi_ctx = CpiContext::new_with_signer(
+            self.token_program.to_account_info(), 
+            transfer_accounts,
+            &signer_seeds,
+        );
+        transfer_checked(cpi_ctx, total_amount, self.mint.decimals)?;
+
+        let close_accounts = CloseAccount {
+            account: self.vault_request.to_account_info(),
+            destination: self.buyer.to_account_info(),
+            authority: self.vault_request.to_account_info(),
+        };
+
+        let ctx = CpiContext::new_with_signer(
+            self.token_program.to_account_info(),
+            close_accounts,
+            &signer_seeds,
+        );
+
+        close_account(ctx)
     }
 }
