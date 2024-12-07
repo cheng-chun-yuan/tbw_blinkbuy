@@ -31,6 +31,7 @@ impl RequestGroupManager<'_> {
             store: self.store.key(),
             promo_code,
             owner: self.owner.key(),
+            num_order: 0,
             activated: false,
         });
         Ok(())

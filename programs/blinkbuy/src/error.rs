@@ -8,4 +8,6 @@ pub enum ErrorCode {
     UpdateAmountError,
     #[msg("min value should be lower than max value")]
     MinLargerThanMaxError,
+    #[msg("the group order is already finished")]
+    TimeIsOverError,
 }

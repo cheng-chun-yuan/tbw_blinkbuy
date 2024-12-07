@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use solana_program::clock::Clock;
 
 use anchor_spl::{
     associated_token::AssociatedToken,
@@ -10,6 +11,7 @@ use anchor_spl::{
 
 use crate::GroupOrder;
 use crate::GroupRequest;
+use crate::error::ErrorCode;
 
 #[derive(Accounts)]
 pub struct CancelRequest<'info> {
@@ -53,6 +55,7 @@ pub struct CancelRequest<'info> {
 
 impl CancelRequest<'_> {
     pub fn cancel_request(&mut self, amount: u64) -> Result<()> {
+        require!(Clock::get().unix_timestamp < self.group_order.expired_time, ErrorCode::TimeIsOverError);
         let total_amount = self.group_order.price * amount;
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"group_request",
