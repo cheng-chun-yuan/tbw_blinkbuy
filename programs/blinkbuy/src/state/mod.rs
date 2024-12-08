@@ -5,21 +5,23 @@ use anchor_lang::prelude::*;
 #[derive(InitSpace)]
 pub struct StoreCertificate {
     pub store_owner: Pubkey,
-    pub num_product: u8,
-    pub num_manager: u8,
+    pub num_product: u64,
+    pub num_manager: u64,
     pub bump: u8,
 }
 
 #[account]
 #[derive(InitSpace)]
 pub struct StoreProduct {
+    pub num_product: u64,
     pub owner: Pubkey,
     pub mint_nft: Pubkey,
     pub total_issued_amount: u64,
     pub reserved_amount: u64,
     pub sold_amount: u64, 
-    pub num_requirement: u8,
+    pub num_requirement: u64,
     pub mint_bump: u8,
+    pub bump: u8,
 }
 
 #[account]
@@ -28,6 +30,7 @@ pub struct PriceRequirement {
     pub product_id: Pubkey,
     pub min_amount: u64,
     pub max_amount: u64,
+    pub num_requirement: u64,
     pub price: u64,
     pub currency: Pubkey,
     pub init_fee: u64,
@@ -39,8 +42,8 @@ pub struct GroupManagerCertificate {
     pub store: Pubkey,
     #[max_len(8, 8)]
     pub promo_code: Vec<u8>,
-    pub owner: Pubkey,
-    pub num_order: u8,
+    pub manager: Pubkey,
+    pub num_order: u64,
     pub activated: bool,
 }
 
@@ -48,7 +51,7 @@ pub struct GroupManagerCertificate {
 #[derive(InitSpace)]
 pub struct GroupOrder {
     pub group_manager: Pubkey,
-    pub price_requirement: Pubkey,
+    pub num_requirement: u64,
     pub group_manager_certificate: Pubkey,
     pub current_amount: u64,
     pub manager_refund: u64,
@@ -58,7 +61,7 @@ pub struct GroupOrder {
     pub max_amount: u64,
     pub currency: Pubkey,
     pub price: u64,
-    pub num_order: u8,
+    pub num_order: u64,
     pub bump: u8,
 }
 

@@ -8,9 +8,9 @@ pub struct RequestGroupManager<'info> {
     #[account(mut)]
     pub manager: Signer<'info>,
     #[account(mut)]
-    pub owner: SystemAccount<'info>,
+    pub store_owner: SystemAccount<'info>,
     #[account(
-        seeds = [b"store", owner.key().as_ref()],
+        seeds = [b"store", store_owner.key().as_ref()],
         bump
     )]
     pub store: Box<Account<'info, StoreCertificate>>,
@@ -18,7 +18,7 @@ pub struct RequestGroupManager<'info> {
         init,
         payer = manager,
         space = 8 + GroupManagerCertificate::INIT_SPACE,
-        seeds = [b"store",store.key().as_ref(), manager.key().as_ref()],
+        seeds = [b"store", store.key().as_ref(), manager.key().as_ref()],
         bump
     )]
     pub group_manager_certificate: Box<Account<'info, GroupManagerCertificate>>,
@@ -30,7 +30,7 @@ impl RequestGroupManager<'_> {
         self.group_manager_certificate.set_inner( GroupManagerCertificate {
             store: self.store.key(),
             promo_code,
-            owner: self.owner.key(),
+            manager: self.manager.key(),
             num_order: 0,
             activated: false,
         });

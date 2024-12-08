@@ -10,7 +10,7 @@ use anchor_spl::{
     },
 };
 use spl_token_metadata_interface::state::TokenMetadata;
-use crate::error::ErrorCode;
+
 use crate::StoreCertificate;
 use crate::StoreProduct;
 
@@ -33,7 +33,7 @@ pub struct AddProduct<'info> {
         mut,
         has_one = store_owner,
         seeds = [b"store", store_owner.key().as_ref()],
-        bump
+        bump, 
     )]
     pub store: Box<Account<'info, StoreCertificate>>,
     
@@ -41,8 +41,8 @@ pub struct AddProduct<'info> {
         init,
         payer = store_owner,
         space = 8 + StoreProduct::INIT_SPACE,
-        seeds = [b"store", store.key().as_ref(),store.num_product.to_le_bytes().as_ref()],
-        bump
+        seeds = [b"store_product", store.key().as_ref(), store.num_product.to_le_bytes().as_ref()],
+        bump,
     )]
     pub product: Account<'info, StoreProduct>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -53,12 +53,14 @@ pub struct AddProduct<'info> {
 impl AddProduct<'_> {
     pub fn add_product(&mut self, total_issued_amount: u64, name: String, symbol: String, uri: String, bumps: &AddProductBumps) -> Result<()> {
         self.product.set_inner( StoreProduct {
+            num_product: self.store.num_product,
             owner: self.store_owner.key(),
             mint_nft: self.mint_nft.key(),
             total_issued_amount,
             num_requirement: 0,
             reserved_amount: 0,
             sold_amount: 0,
+            bump: bumps.product,
             mint_bump: bumps.mint_nft
         });
         self.store.num_product += 1;
@@ -83,7 +85,7 @@ impl AddProduct<'_> {
         )?;
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"mint",
-            self.store_owner.to_account_info().key.as_ref(),
+            self.product.to_account_info().key.as_ref(),
             &[bumps.mint_nft],
         ]];
         let init_mint_accounts = TokenMetadataInitialize {
@@ -99,10 +101,5 @@ impl AddProduct<'_> {
             &signer_seeds,
         );
         token_metadata_initialize(ctx, name, symbol, uri)
-    }
-    pub fn update_total_issued_amount(&mut self, total_issued_amount: u64) -> Result<()> {
-        require!(total_issued_amount > self.product.sold_amount + self.product.reserved_amount, ErrorCode::UpdateAmountError);
-        self.product.total_issued_amount = total_issued_amount;
-        Ok(())
     }
 }

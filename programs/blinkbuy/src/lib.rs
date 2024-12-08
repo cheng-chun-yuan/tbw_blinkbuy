@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("GZrGD3afkm4iNTtz1fhLJJX1VViuu2q1pd9aRRdUfBEr");
+declare_id!("8KDsLTs1MDxbYCVz1gwqe9EceuUgjRFqY7iDNV9RAvwq");
 
 #[program]
 pub mod blinkbuy {
@@ -23,8 +23,12 @@ pub mod blinkbuy {
         ctx.accounts.add_product(total_issued_amount, name, symbol, uri, &ctx.bumps)
     }
 
-    pub fn update_total_issued_amount(ctx: Context<AddProduct>, total_issued_amount: u64) -> Result<()> {
+    pub fn update_total_issued_amount(ctx: Context<UpdateProduct>, total_issued_amount: u64) -> Result<()> {
         ctx.accounts.update_total_issued_amount(total_issued_amount)
+    }
+
+    pub fn add_price_requirement(ctx: Context<AddPriceRequirement>, min_amount: u64, max_amount: u64, price: u64, init_fee: u64) -> Result<()> {
+        ctx.accounts.add_price_requirement(min_amount, max_amount, price, init_fee)
     }
 
     pub fn request_group_manager(ctx: Context<RequestGroupManager>, promo_code: Vec<u8>) -> Result<()> {
@@ -33,5 +37,21 @@ pub mod blinkbuy {
 
     pub fn approve_group_manager(ctx: Context<ApproveGroupManager>) -> Result<()> {
         ctx.accounts.approve_group_manager()
+    }
+
+    pub fn create_group_order(ctx: Context<CreateGroupOrder>, manager_refund: u64, start_time: u64, num_requirement: u64, expired_time: u64) -> Result<()> {
+        ctx.accounts.create_group_order(manager_refund, start_time, num_requirement, expired_time, &ctx.bumps)
+    }
+
+    pub fn buy_product(ctx: Context<BuyProduct>, amount: u64) -> Result<()> {
+        ctx.accounts.buy_product(amount, &ctx.bumps)
+    }
+
+    pub fn cancel_request(ctx: Context<CancelRequest>) -> Result<()> {
+        ctx.accounts.cancel_request()
+    }
+
+    pub fn claim_product(ctx: Context<ClaimProduct>) -> Result<()> {
+        ctx.accounts.claim_product()
     }
 }

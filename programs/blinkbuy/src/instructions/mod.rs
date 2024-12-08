@@ -7,7 +7,9 @@ pub mod create_group_order;
 pub mod buy_product;
 pub mod claim_product;
 pub mod cancel_request;
+pub mod update_product;
 
+pub use update_product::*;
 pub use cancel_request::*;
 pub use claim_product::*;
 pub use buy_product::*;

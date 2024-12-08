@@ -8,14 +8,14 @@ use crate::StoreProduct;
 #[derive(Accounts)]
 pub struct AddPriceRequirement<'info> {
     #[account(mut)]
-    pub owner: Signer<'info>,
+    pub store_owner: Signer<'info>,
     #[account(
         mint::token_program = token_program
     )]
     pub currency: InterfaceAccount<'info, Mint>,
     #[account(
         init,
-        payer = owner,
+        payer = store_owner,
         space = 8 + PriceRequirement::INIT_SPACE,
         seeds = [b"price_requirement", product.key().as_ref(), product.num_requirement.to_le_bytes().as_ref()],
         bump
@@ -23,13 +23,13 @@ pub struct AddPriceRequirement<'info> {
     pub price_requirement: Account<'info, PriceRequirement>,
     #[account(
         mut,
-        seeds = [b"store", owner.key().as_ref()],
+        seeds = [b"store", store_owner.key().as_ref()],
         bump
     )]
     pub store: Box<Account<'info, StoreCertificate>>,
     #[account(
         mut,
-        seeds = [b"store", store.key().as_ref(),store.num_product.to_le_bytes().as_ref()],
+        seeds = [b"store_product", store.key().as_ref(), product.num_product.to_le_bytes().as_ref()],
         bump
     )]
     pub product: Account<'info, StoreProduct>,
@@ -43,6 +43,7 @@ impl AddPriceRequirement<'_> {
             product_id: self.product.key(),
             min_amount,
             max_amount,
+            num_requirement: self.product.num_product,
             price,
             currency: self.currency.key(),
             init_fee,

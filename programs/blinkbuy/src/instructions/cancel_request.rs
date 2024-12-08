@@ -19,12 +19,12 @@ pub struct CancelRequest<'info> {
     #[account(mut)]
     pub buyer: Signer<'info>,
     #[account(mut)]
-    pub owner: SystemAccount<'info>,
+    pub manager: SystemAccount<'info>,
     pub currency: InterfaceAccount<'info, Mint>,
     #[account(
         mut,
         has_one = currency,
-        seeds = [b"group_order", owner.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
+        seeds = [b"group_order", manager.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
         bump
     )]
     pub group_order: Box<Account<'info, GroupOrder>>,
@@ -47,7 +47,7 @@ pub struct CancelRequest<'info> {
         close = buyer,
         has_one = buyer,
         has_one = group_order,
-        seeds = [b"group_request", group_order.key().as_ref()],
+        seeds = [b"group_request", group_order.key().as_ref(), buyer.key().as_ref()],
         bump
     )]
     pub group_request: Account<'info, GroupRequest>,
@@ -67,7 +67,7 @@ impl CancelRequest<'_> {
         let total_amount = self.group_order.price * self.group_request.amount;
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"group_order",
-            self.owner.to_account_info().key.as_ref(),
+            self.manager.to_account_info().key.as_ref(),
             &self.group_order.num_order.to_le_bytes()[..],
             &[self.group_order.bump],
         ]];

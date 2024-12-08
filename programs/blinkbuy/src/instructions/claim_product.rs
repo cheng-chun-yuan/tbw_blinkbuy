@@ -17,7 +17,7 @@ pub struct ClaimProduct<'info> {
     #[account(mut)]
     pub buyer: Signer<'info>,
     #[account(mut)]
-    pub group_manager: SystemAccount<'info>,
+    pub manager: SystemAccount<'info>,
 
     #[account(mut)]
     pub store_owner: SystemAccount<'info>,
@@ -49,18 +49,16 @@ pub struct ClaimProduct<'info> {
     )]
     pub buyer_ata_nft: Box<InterfaceAccount<'info, TokenAccount>>,
 
-    pub mint: InterfaceAccount<'info, Mint>,
-
     #[account(
         mut,
-        seeds = [b"store", store.key().as_ref(),store.num_product.to_le_bytes().as_ref()],
+        seeds = [b"store_product", store.key().as_ref(),product.num_product.to_le_bytes().as_ref()],
         bump
     )]
     pub product: Account<'info, StoreProduct>,
 
     #[account(
         mut,
-        seeds = [b"group_order", group_manager.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
+        seeds = [b"group_order", manager.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
         bump
     )]
     pub group_order: Box<Account<'info, GroupOrder>>,
@@ -71,14 +69,6 @@ pub struct ClaimProduct<'info> {
         bump
     )]
     pub group_request: Account<'info, GroupRequest>,
-
-    #[account(
-        mut,
-        associated_token::mint = mint,
-        associated_token::authority = group_order,
-        associated_token::token_program = token_program,
-    )]
-    pub vault_group_order: Box<InterfaceAccount<'info, TokenAccount>>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -95,13 +85,13 @@ impl ClaimProduct<'_> {
 
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"mint",
-            self.store_owner.to_account_info().key.as_ref(),
+            self.product.to_account_info().key.as_ref(),
             &[self.product.mint_bump],
         ]];
 
         let mint_accounts = MintTo {
             mint: self.mint_nft.to_account_info(),
-            to: self.store_owner.to_account_info(),
+            to: self.buyer_ata_nft.to_account_info(),
             authority: self.mint_nft.to_account_info()
         };
         let ctx_mint = CpiContext::new_with_signer(

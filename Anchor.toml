@@ -4,14 +4,14 @@
 resolution = true
 skip-lint = false
 
-[programs.localnet]
-blinkbuy = "GZrGD3afkm4iNTtz1fhLJJX1VViuu2q1pd9aRRdUfBEr"
+[programs.devnet]
+blinkbuy = "8KDsLTs1MDxbYCVz1gwqe9EceuUgjRFqY7iDNV9RAvwq"
 
 [registry]
-url = "https://api.apr.dev"
+url = "devnet"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

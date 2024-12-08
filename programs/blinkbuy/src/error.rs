@@ -16,4 +16,6 @@ pub enum ErrorCode {
     NotExceedMinError,
     #[msg("Exceed the max requirement")]
     ExceedMaxError,
+    #[msg("Not initial account error")]
+    NotInitError,
 }
