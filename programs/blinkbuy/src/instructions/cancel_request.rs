@@ -11,6 +11,7 @@ use anchor_spl::{
 
 use crate::GroupOrder;
 use crate::GroupRequest;
+
 use crate::error::ErrorCode;
 
 #[derive(Accounts)]
@@ -59,9 +60,9 @@ impl CancelRequest<'_> {
     pub fn cancel_request(&mut self) -> Result<()> {
         let clock = Clock::get().unwrap();
         let unix_timestamp = clock.unix_timestamp as u64;
-
-        require!(unix_timestamp < self.group_order.expired_time, ErrorCode::TimeIsOverError);
-
+        if self.group_order.current_amount >= self.group_order.min_amount {
+            require!(unix_timestamp < self.group_order.expired_time, ErrorCode::TimeIsOverError);
+        }
         self.group_order.current_amount -= self.group_request.amount;
         let total_amount = self.group_order.price * self.group_request.amount;
         let signer_seeds: [&[&[u8]]; 1] = [&[

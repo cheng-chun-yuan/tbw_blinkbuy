@@ -9,12 +9,11 @@ use crate::GroupRequest;
 use crate::GroupOrder;
 use crate::StoreProduct;
 use crate::StoreCertificate;
-use crate::PriceRequirement;
 
 use crate::error::ErrorCode;
 
 #[derive(Accounts)]
-pub struct ClaimProductOrRefund<'info> {
+pub struct ClaimProduct<'info> {
     #[account(mut)]
     pub buyer: Signer<'info>,
     #[account(mut)]
@@ -61,7 +60,6 @@ pub struct ClaimProductOrRefund<'info> {
 
     #[account(
         mut,
-        has_one = price_requirement,
         seeds = [b"group_order", group_manager.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
         bump
     )]
@@ -76,13 +74,6 @@ pub struct ClaimProductOrRefund<'info> {
 
     #[account(
         mut,
-        seeds = [b"price_requirement", product.key().as_ref(), product.num_requirement.to_le_bytes().as_ref()],
-        bump
-    )]
-    pub price_requirement: Account<'info, PriceRequirement>,
-
-    #[account(
-        mut,
         associated_token::mint = mint,
         associated_token::authority = group_order,
         associated_token::token_program = token_program,
@@ -94,13 +85,13 @@ pub struct ClaimProductOrRefund<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl ClaimProductOrRefund<'_> {
+impl ClaimProduct<'_> {
     pub fn claim_product(&mut self) -> Result<()> {
         let clock = Clock::get().unwrap();
         let unix_timestamp = clock.unix_timestamp as u64;
 
         require!(unix_timestamp >= self.group_order.expired_time, ErrorCode::TimeIsNotOverError);
-        require!(self.group_order.current_amount >= self.price_requirement.min_amount, ErrorCode::NotExceedMinError);
+        require!(self.group_order.current_amount >= self.group_order.min_amount, ErrorCode::NotExceedMinError);
 
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"mint",

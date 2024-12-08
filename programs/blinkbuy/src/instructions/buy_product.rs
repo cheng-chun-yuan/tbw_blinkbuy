@@ -8,6 +8,8 @@ use anchor_spl::{
 use crate::GroupOrder;
 use crate::GroupRequest;
 
+use crate::error::ErrorCode;
+
 #[derive(Accounts)]
 pub struct BuyProduct<'info> {
     #[account(mut)]
@@ -49,7 +51,6 @@ pub struct BuyProduct<'info> {
         bump
     )]
     pub group_request: Account<'info, GroupRequest>,
-
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
     pub system_program: Program<'info, System>,
@@ -63,6 +64,7 @@ impl BuyProduct<'_> {
             amount,
             bump: bumps.group_request,
         });
+        require!(self.group_order.current_amount + amount <= self.group_order.max_amount, ErrorCode::ExceedMaxError);
         self.group_order.current_amount += amount;
         let total_amount = self.group_order.price * amount;
         let transfer_accounts = TransferChecked {

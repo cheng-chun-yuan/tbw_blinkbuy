@@ -5,11 +5,11 @@ pub mod request_group_manager;
 pub mod approve_group_manager;
 pub mod create_group_order;
 pub mod buy_product;
-pub mod claim_product_or_refund;
+pub mod claim_product;
 pub mod cancel_request;
 
 pub use cancel_request::*;
-pub use claim_product_or_refund::*;
+pub use claim_product::*;
 pub use buy_product::*;
 pub use create_group_order::*;
 pub use approve_group_manager::*;

@@ -54,6 +54,8 @@ impl CreateGroupOrder<'_> {
             manager_refund,
             start_time,
             expired_time,
+            min_amount: self.price_requirement.min_amount,
+            max_amount: self.price_requirement.max_amount,
             currency: self.price_requirement.currency.key(),
             price,
             bump: bumps.group_order,

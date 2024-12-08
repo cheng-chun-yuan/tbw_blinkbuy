@@ -14,4 +14,6 @@ pub enum ErrorCode {
     TimeIsNotOverError,
     #[msg("Not fulfill the min requirement")]
     NotExceedMinError,
+    #[msg("Exceed the max requirement")]
+    ExceedMaxError,
 }

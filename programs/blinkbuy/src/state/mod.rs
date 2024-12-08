@@ -54,6 +54,8 @@ pub struct GroupOrder {
     pub manager_refund: u64,
     pub start_time: u64,
     pub expired_time: u64,
+    pub min_amount: u64,
+    pub max_amount: u64,
     pub currency: Pubkey,
     pub price: u64,
     pub num_order: u8,
