@@ -10,4 +10,8 @@ pub enum ErrorCode {
     MinLargerThanMaxError,
     #[msg("the group order is already finished")]
     TimeIsOverError,
+    #[msg("the group order is not finished")]
+    TimeIsNotOverError,
+    #[msg("Not fulfill the min requirement")]
+    NotExceedMinError,
 }

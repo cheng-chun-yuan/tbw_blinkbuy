@@ -1,33 +1,37 @@
 use anchor_lang::prelude::*;
-
 use crate::PriceRequirement;
 use crate::StoreCertificate;
 use crate::GroupManagerCertificate;
 use crate::GroupOrder;
+use crate::StoreProduct;
 
 #[derive(Accounts)]
 pub struct CreateGroupOrder<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     #[account(
-        seeds = [b"store", owner.key().as_ref()],
+        seeds = [b"store", store.key().as_ref(),store.num_product.to_le_bytes().as_ref()],
         bump
     )]
-    pub price_requirement: Account<'info, PriceRequirement>,
+    pub product: Box<Account<'info, StoreProduct>>,
+    #[account(
+        seeds = [b"price_requirement", product.key().as_ref(), product.num_requirement.to_le_bytes().as_ref()],
+        bump
+    )]
+    pub price_requirement: Box<Account<'info, PriceRequirement>>,
     #[account(
         mut,
-        has_one = owner,
         seeds = [b"store", owner.key().as_ref()],
         bump
     )]
-    pub store: Account<'info, StoreCertificate>,
+    pub store: Box<Account<'info, StoreCertificate>>,
     #[account(
         mut,
         has_one = owner,
         seeds = [b"store",store.key().as_ref(), owner.key().as_ref()],
         bump
     )]
-    pub group_manager_certificate: Account<'info, GroupManagerCertificate>,
+    pub group_manager_certificate: Box<Account<'info, GroupManagerCertificate>>,
     #[account(
         init,
         payer = owner,
@@ -35,7 +39,7 @@ pub struct CreateGroupOrder<'info> {
         seeds = [b"group_order", owner.key().as_ref(), group_manager_certificate.num_order.to_le_bytes().as_ref()],
         bump
     )]
-    pub group_order: Account<'info, GroupOrder>,
+    pub group_order: Box<Account<'info, GroupOrder>>,
     pub system_program: Program<'info, System>,
 }
 
@@ -50,10 +54,11 @@ impl CreateGroupOrder<'_> {
             manager_refund,
             start_time,
             expired_time,
+            currency: self.price_requirement.currency.key(),
             price,
             bump: bumps.group_order,
         });
-        self.group_manager_certificate.num_order += 1;
+        self.product.reserved_amount += self.price_requirement.max_amount;
         Ok(())
     }
 }

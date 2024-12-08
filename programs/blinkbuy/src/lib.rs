@@ -19,8 +19,8 @@ pub mod blinkbuy {
         ctx.accounts.create_store(&ctx.bumps)
     }
 
-    pub fn add_product(ctx: Context<AddProduct>, total_issued_amount: u64) -> Result<()> {
-        ctx.accounts.add_product(total_issued_amount)
+    pub fn add_product(ctx: Context<AddProduct>, total_issued_amount: u64, name: String, symbol: String, uri: String ) -> Result<()> {
+        ctx.accounts.add_product(total_issued_amount, name, symbol, uri, &ctx.bumps)
     }
 
     pub fn update_total_issued_amount(ctx: Context<AddProduct>, total_issued_amount: u64) -> Result<()> {

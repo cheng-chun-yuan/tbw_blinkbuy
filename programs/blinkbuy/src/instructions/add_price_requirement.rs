@@ -26,7 +26,7 @@ pub struct AddPriceRequirement<'info> {
         seeds = [b"store", owner.key().as_ref()],
         bump
     )]
-    pub store: Account<'info, StoreCertificate>,
+    pub store: Box<Account<'info, StoreCertificate>>,
     #[account(
         mut,
         seeds = [b"store", store.key().as_ref(),store.num_product.to_le_bytes().as_ref()],

@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct StoreCertificate {
-    pub owner: Pubkey,
+    pub store_owner: Pubkey,
     pub num_product: u8,
     pub num_manager: u8,
     pub bump: u8,
@@ -19,6 +19,7 @@ pub struct StoreProduct {
     pub reserved_amount: u64,
     pub sold_amount: u64, 
     pub num_requirement: u8,
+    pub mint_bump: u8,
 }
 
 #[account]
@@ -53,6 +54,7 @@ pub struct GroupOrder {
     pub manager_refund: u64,
     pub start_time: u64,
     pub expired_time: u64,
+    pub currency: Pubkey,
     pub price: u64,
     pub num_order: u8,
     pub bump: u8,

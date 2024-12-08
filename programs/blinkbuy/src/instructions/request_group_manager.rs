@@ -13,7 +13,7 @@ pub struct RequestGroupManager<'info> {
         seeds = [b"store", owner.key().as_ref()],
         bump
     )]
-    pub store: Account<'info, StoreCertificate>,
+    pub store: Box<Account<'info, StoreCertificate>>,
     #[account(
         init,
         payer = manager,
@@ -21,7 +21,7 @@ pub struct RequestGroupManager<'info> {
         seeds = [b"store",store.key().as_ref(), manager.key().as_ref()],
         bump
     )]
-    pub group_manager_certificate: Account<'info, GroupManagerCertificate>,
+    pub group_manager_certificate: Box<Account<'info, GroupManagerCertificate>>,
     pub system_program: Program<'info, System>,
 }
 
