@@ -9,6 +9,7 @@ use crate::GroupRequest;
 use crate::GroupOrder;
 use crate::StoreProduct;
 use crate::StoreCertificate;
+use crate::MembershipCard;
 
 use crate::error::ErrorCode;
 
@@ -69,6 +70,14 @@ pub struct ClaimProduct<'info> {
         bump
     )]
     pub group_request: Account<'info, GroupRequest>,
+    #[account(
+        init_if_needed,
+        payer = buyer,
+        space = 8 + MembershipCard::INIT_SPACE,
+        seeds = [b"membership", store.key().as_ref(), buyer.key().as_ref()],
+        bump
+    )]
+    pub membership_card: Account<'info, MembershipCard>,
 
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub token_program: Interface<'info, TokenInterface>,
@@ -88,6 +97,10 @@ impl ClaimProduct<'_> {
             self.product.to_account_info().key.as_ref(),
             &[self.product.mint_bump],
         ]];
+
+        self.membership_card.owner = self.buyer.key();
+        self.membership_card.total_spent += self.group_request.amount * self.group_order.price;
+        self.membership_card.last_updated = unix_timestamp;
 
         let mint_accounts = MintTo {
             mint: self.mint_nft.to_account_info(),

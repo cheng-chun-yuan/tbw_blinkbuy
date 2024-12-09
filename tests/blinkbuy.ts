@@ -199,7 +199,7 @@ describe("blinkbuy", () => {
   it("add_price_requirement1!", async () => {
     // Add your test here.
     const min_amount = new BN(10)
-    const max_amount = new BN(20)
+    const max_amount = new BN(50)
     const price = new BN(1e9)
     const init_fee = new BN(1e6)
     await program.methods
@@ -310,7 +310,6 @@ describe("blinkbuy", () => {
   });
 
   it("claim_product!", async () => {
-    // Add your test here.
     await program.methods
       .claimProduct()
       .accounts({

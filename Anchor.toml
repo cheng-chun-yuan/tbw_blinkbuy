@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-blinkbuy = "8KDsLTs1MDxbYCVz1gwqe9EceuUgjRFqY7iDNV9RAvwq"
+blinkbuy = "HhVmWLhStUhGN5BctZtwtx277vHEYYNpuaPJu75L2ypp"
 
 [registry]
 url = "devnet"
