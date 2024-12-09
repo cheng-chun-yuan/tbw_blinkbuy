@@ -14,14 +14,12 @@ use crate::error::ErrorCode;
 pub struct BuyProduct<'info> {
     #[account(mut)]
     pub buyer: Signer<'info>,
-    #[account(mut)]
-    pub manager: SystemAccount<'info>,
     pub currency: InterfaceAccount<'info, Mint>,
 
     #[account(
         mut,
         has_one = currency,
-        seeds = [b"group_order", manager.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
+        seeds = [b"group_order", group_order.manager.key().as_ref(), group_order.num_order.to_le_bytes().as_ref()],
         bump
     )]
     pub group_order: Box<Account<'info, GroupOrder>>,

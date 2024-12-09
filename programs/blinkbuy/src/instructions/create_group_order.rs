@@ -50,7 +50,7 @@ impl CreateGroupOrder<'_> {
         let price = self.price_requirement.price * ( 100 + manager_refund ) / 100;
         self.group_order.set_inner( GroupOrder {
             num_order: self.group_manager_certificate.num_order,
-            group_manager: self.manager.key(),
+            manager: self.manager.key(),
             num_requirement,
             group_manager_certificate: self.group_manager_certificate.key(),
             current_amount: 0,
