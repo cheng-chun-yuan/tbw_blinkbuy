@@ -23,6 +23,7 @@ import { Program, BN } from "@coral-xyz/anchor";
 
 import BlinkbuyJson from "@/app/idl/blinkbuy.json";
 import { type Blinkbuy} from "@/app/idl/blinkbuy";
+import { connect } from "net";
 
 const params = {
   title: 'AirPods - Elevate Your Audio Experience',
@@ -31,21 +32,91 @@ const params = {
   label: "AirPods - Mint Now!"
 }
 
-export const GET = (req: Request, { param }: { param: { grouporder: string } },) => {
-  const  group_order = 'param';
+function getDescription({
+  currentAmount,
+  startTime,
+  expiredTime,
+  minAmount,
+  maxAmount,
+  price,
+  manager,
+}: {
+  currentAmount: anchor.BN;
+  startTime: anchor.BN;
+  expiredTime: anchor.BN;
+  minAmount: anchor.BN;
+  maxAmount: anchor.BN;
+  price: anchor.BN;
+  manager: PublicKey;
+}): string {
+  // Convert BN and PublicKey values to string for readability
+  const current = currentAmount.toString();
+  const start = new Date(startTime.toNumber() * 1000).toLocaleString(); // Convert UNIX to Date
+  const expiry = new Date(expiredTime.toNumber() * 1000).toLocaleString();
+  const min = minAmount.toString();
+  const max = maxAmount.toString();
+  const priceValue = (Number(price)/1e6).toString();
+  const managerAddress = manager.toString();
+
+  // Construct the description
+  return `
+    Group Order Details:
+    - Manager: Albert
+    - Current Progress: ${current} items purchased
+    - Start Time: ${start}
+    - Expiry Time: ${expiry}
+    - Minimum Order Requirement: ${min} items
+    - Maximum Order Capacity: ${max} items
+    - Price per Item: ${priceValue} BONK
+  `;
+}
+
+
+export const GET = async (req: Request) => {
+  const connection = new Connection(clusterApiUrl('devnet'), {
+    commitment: "confirmed",
+  });
+  const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
+
+  const { searchParams } = new URL(req.url);
+  const group_order_param = searchParams.get('grouporder') || "default";
+  const group_order = new PublicKey(group_order_param);
+
+  const group_order_data = await program.account.groupOrder.fetch(group_order)
+  const {
+    manager,
+    numRequirement,
+    groupManagerCertificate,
+    currentAmount,
+    startTime,
+    expiredTime,
+    minAmount,
+    maxAmount,
+    price
+  } = group_order_data;
+  const description = getDescription({
+    currentAmount,
+    startTime,
+    expiredTime,
+    minAmount,
+    maxAmount,
+    price,
+    manager,
+  });
+  
   const payload: ActionGetResponse = {
     title: params.title,
     icon: new URL(
       params.icon,
       new URL(req.url).origin
     ).toString(),
-    description: params.description,
+    description: description,
     label: params.label,
     links:
     {
       "actions": [
         {
-          label: "mint",
+          label: "Buy Now",
           href: `/api/buy/${group_order}?amount={amount}`,
           parameters: [
             // {name} input field
@@ -87,13 +158,16 @@ export const POST = async (req: Request) => {
       commitment: "confirmed",
     });
     const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
-    const manager = new PublicKey("88wovrYcAuc7kokA5J361b9zLZhWYU9j6FSZho5RFqC6")
+
+    // Determined Escrow and Vault addresses
+    const { searchParams } = new URL(req.url);
+    const amount = searchParams.get("amount");
+    const group_order_param = searchParams.get('grouporder') || "default";
+    const group_order = new PublicKey(group_order_param);
   
-    const orderIndex = new BN(0)
-    const group_order = PublicKey.findProgramAddressSync(
-      [Buffer.from("group_order"), manager.toBuffer(), orderIndex.toArrayLike(Buffer, "le", 8)],
-      program.programId
-    )[0];
+    const group_order_data = await program.account.groupOrder.fetch(group_order)
+    const manager = group_order_data.manager
+
     const group_request = PublicKey.findProgramAddressSync(
       [Buffer.from("group_request"), group_order.toBuffer(), provider.toBuffer()],
       program.programId
@@ -108,10 +182,6 @@ export const POST = async (req: Request) => {
       tokenProgram: TOKEN_2022_PROGRAM_ID,
       systemProgram: SystemProgram.programId
     }
-
-    // Determined Escrow and Vault addresses
-    const params = new URL(req.url).searchParams;
-    const amount = params.get("amount");
 
     if (!amount) {
       console.log("amount",amount)
