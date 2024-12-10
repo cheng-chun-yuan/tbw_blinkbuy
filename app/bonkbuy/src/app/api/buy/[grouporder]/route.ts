@@ -86,7 +86,7 @@ export const POST = async (req: Request) => {
     const connection = new Connection(clusterApiUrl('devnet'), {
       commitment: "confirmed",
     });
-    const program = new anchor.Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
+    const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
     const manager = new PublicKey("88wovrYcAuc7kokA5J361b9zLZhWYU9j6FSZho5RFqC6")
   
     const orderIndex = new BN(0)
