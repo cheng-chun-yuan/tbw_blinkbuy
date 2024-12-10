@@ -23,7 +23,6 @@ import { Program, BN } from "@coral-xyz/anchor";
 
 import BlinkbuyJson from "@/app/idl/blinkbuy.json";
 import { type Blinkbuy} from "@/app/idl/blinkbuy";
-import { connect } from "net";
 
 const params = {
   title: 'AirPods - Elevate Your Audio Experience',
@@ -71,12 +70,13 @@ function getDescription({
   `;
 }
 
+const connection = new Connection(clusterApiUrl('devnet'), {
+  commitment: "confirmed",
+});
+const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
 
 export const GET = async (req: Request) => {
-  const connection = new Connection(clusterApiUrl('devnet'), {
-    commitment: "confirmed",
-  });
-  const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
+
 
   const { searchParams } = new URL(req.url);
   const group_order_param = searchParams.get('grouporder') || "default";
@@ -152,12 +152,6 @@ export const POST = async (req: Request) => {
         headers: ACTIONS_CORS_HEADERS, //Must include CORS HEADERS
       });
     }
-
-    // const connection = new Connection(providerUrl);
-    const connection = new Connection(clusterApiUrl('devnet'), {
-      commitment: "confirmed",
-    });
-    const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
 
     // Determined Escrow and Vault addresses
     const { searchParams } = new URL(req.url);

@@ -7,7 +7,7 @@ import { Clock, Users } from 'lucide-react'
 export default function FeaturedDeals() {
   const deals = [
     {
-      id: 1,
+      id: 0,
       name: "Bonk-Cancelling Headphones",
       description: "Silence the cats, embrace the bonks! 🎧🐕",
       image: "/headphone.webp",
@@ -18,7 +18,7 @@ export default function FeaturedDeals() {
       tag: "🔥 Hot Deal",
     },
     {
-      id: 2,
+      id: 1,
       name: "Doge-Approved 4K Smart TV",
       description: "So sharp, you can see the moon from here! 📺🌕",
       image: "/smartTV.webp",
@@ -29,7 +29,7 @@ export default function FeaturedDeals() {
       tag: "👀 Almost Gone",
     },
     {
-      id: 3,
+      id: 2,
       name: "Bonk Vacuum of the Future",
       description: "It bonks the dirt away! 🤖🐾",
       image: "/vacuum.webp",
@@ -40,10 +40,21 @@ export default function FeaturedDeals() {
       tag: "🆕 Just Launched",
     },
     {
-      id: 4,
+      id: 3,
       name: "Bonk Wireless Airpods",
       description: "Listen to the world! 🤖🐾",
       image: "/airpods.webp",
+      progress: 200,
+      target: 180,
+      maximum: 250,
+      timeRemaining: "1d 8h",
+      tag: "🆕 Just Launched",
+    },
+    {
+      id: 4,
+      name: "Bonk smart watch",
+      description: "Bring you the future technology! 🤖🐾",
+      image: "/smartwatch.webp",
       progress: 200,
       target: 180,
       maximum: 250,

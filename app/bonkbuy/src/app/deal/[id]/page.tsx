@@ -11,7 +11,7 @@ import { Clock, Users, ChevronLeft } from "lucide-react";
 // Mock Deals Data
 const mockDeals = [
   {
-    id: 1,
+    id: 0,
     name: "Bonk-Cancelling Headphones",
     description: "Silence the cats, embrace the bonks! 🎧🐕",
     image: "/headphone.webp",
@@ -24,7 +24,7 @@ const mockDeals = [
       "These headphones are equipped with bonk-level noise cancellation technology to block out distractions. Perfect for focusing on your music or work.",
   },
   {
-    id: 2,
+    id: 1,
     name: "Doge-Approved 4K Smart TV",
     description: "So sharp, you can see the moon from here! 📺🌕",
     image: "/smartTV.webp",
@@ -37,7 +37,7 @@ const mockDeals = [
       "Experience stunning visuals with this Doge-Approved 4K Smart TV. With cutting-edge HDR support, every detail comes to life.",
   },
   {
-    id: 3,
+    id: 2,
     name: "Bonk Vacuum of the Future",
     description: "It bonks the dirt away! 🤖🐾",
     image: "/vacuum.webp",
@@ -50,7 +50,7 @@ const mockDeals = [
       "The Bonk Vacuum of the Future comes with AI-powered cleaning and multi-surface compatibility for effortless cleaning.",
   },
   {
-    id: 4,
+    id: 3,
     name: "Bonk Wireless Airpods",
     description: "Listen to the world! 🤖🐾",
     image: "/airpods.webp",
@@ -61,6 +61,19 @@ const mockDeals = [
     tag: "🎧 New Arrival",
     details:
       "Wireless, seamless, and crystal-clear sound! These Bonk Wireless Airpods redefine your listening experience.",
+  },
+  {
+    id: 4,
+    name: "Bonk smart watch",
+    description: "Bring you the future technology! 🤖🐾",
+    image: "/smartwatch.webp",
+    progress: 200,
+    target: 180,
+    maximum: 250,
+    timeRemaining: "1d 8h",
+    tag: "🆕 Just Launched",
+    details:
+      "Track your life with style! The Bonk Smart Watch combines cutting-edge technology with sleek design for the ultimate wearable experience.",
   },
 ];
 

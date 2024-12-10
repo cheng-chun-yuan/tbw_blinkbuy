@@ -1,0 +1,12 @@
+{
+    "name": "Bonk-Cancelling Headphones",
+    "symbol": "headphone",
+    "description": "Silence the cats, embrace the bonks!",
+    "image": "https://gateway.pinata.cloud/ipfs/bafkreickz4bbe3ct5mutofvjpa2y5ndgsbi3oykbv4lvscuwv32qsdeaz4",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

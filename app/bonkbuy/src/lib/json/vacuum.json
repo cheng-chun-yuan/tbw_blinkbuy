@@ -1,0 +1,12 @@
+{
+    "name": "Bonk Vacuum of the Future",
+    "symbol": "vacuum",
+    "description": "It bonks the dirt away!",
+    "image": "https://gateway.pinata.cloud/ipfs/bafkreig5hioz4uj6r3uz3jsnhk6tyvd7wluskqruphpian62aa35rzula4",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

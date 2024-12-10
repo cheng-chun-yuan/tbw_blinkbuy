@@ -42,7 +42,7 @@ pub struct BuyProduct<'info> {
     pub vault_group_order: Box<InterfaceAccount<'info, TokenAccount>>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = buyer,
         space = 8 + GroupRequest::INIT_SPACE,
         seeds = [b"group_request", group_order.key().as_ref(), buyer.key().as_ref()],
@@ -56,12 +56,10 @@ pub struct BuyProduct<'info> {
 
 impl BuyProduct<'_> {
     pub fn buy_product(&mut self, amount: u64, bumps: &BuyProductBumps) -> Result<()> {
-        self.group_request.set_inner( GroupRequest {
-            buyer: self.buyer.key(),
-            group_order: self.group_order.key(),
-            amount,
-            bump: bumps.group_request,
-        });
+        self.group_request.buyer = self.buyer.key();
+        self.group_request.group_order =  self.group_order.key();
+        self.group_request.amount += amount;
+        self.group_request.bump = bumps.group_request;
         require!(self.group_order.current_amount + amount <= self.group_order.max_amount, ErrorCode::ExceedMaxError);
         self.group_order.current_amount += amount;
         let total_amount = self.group_order.price * amount;

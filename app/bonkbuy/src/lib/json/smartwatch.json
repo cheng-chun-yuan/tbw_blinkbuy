@@ -1,0 +1,12 @@
+{
+    "name": "Bonk smart watch",
+    "symbol": "smartwatch",
+    "description": "Bring you the future technology!",
+    "image": "https://gateway.pinata.cloud/ipfs/bafkreieftdx3rvs6b6thn63x6uuctyeqckjesgtmschqbcytiuzze3yoaa",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

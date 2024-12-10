@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("AkcuJCPFYioPG7yq1k9igMHF7SapejrFE6TbAX4oDxxL");
+declare_id!("53cF82S7Q4VFiqAfSdbUdKbs5A5oD72efpZ8GUqsZvkX");
 
 #[program]
 pub mod blinkbuy {

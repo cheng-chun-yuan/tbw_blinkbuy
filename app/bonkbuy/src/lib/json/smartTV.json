@@ -1,0 +1,12 @@
+{
+    "name": "Doge-Approved 4K Smart TV",
+    "symbol": "smarttv",
+    "description": "So sharp, you can see the moon from here!",
+    "image": "https://gateway.pinata.cloud/ipfs/bafybeibwrvhmyxcvis6cirbdeuwtaxdn2avrsr2adb4zaeddw42fpn3ela",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

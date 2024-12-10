@@ -1,0 +1,12 @@
+{
+    "name": "Bonk Wireless Airpods",
+    "symbol": "airpods",
+    "description": "Listen to the world!",
+    "image": "https://gateway.pinata.cloud/ipfs/bafkreieh7d4uhabwtvh6ooqfl6wjnfeorg2tvpcq5gcmrb2blix5yb3sby",
+    "attributes": [
+      {
+        "trait_type": "Item",
+        "value": "Developer Portal"
+      }
+    ]
+  }

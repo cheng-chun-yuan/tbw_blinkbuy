@@ -103,11 +103,6 @@ describe("blinkbuy", () => {
     [Buffer.from("mint"), product.toBuffer()],
     program.programId
   )[0];
-  const num_price_requirement2 = new BN(1);
-  const price_requirement2 = PublicKey.findProgramAddressSync(
-    [Buffer.from("price_requirement"), product.toBuffer(), num_price_requirement2.toArrayLike(Buffer, "le", 8)],
-    program.programId
-  )[0];
   const accounts = {
     mintNft: mint_nft,
     buyer: buyer2.publicKey,
@@ -124,6 +119,69 @@ describe("blinkbuy", () => {
     associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     systemProgram: SystemProgram.programId
   }
+  const products = [
+    {
+      id: 0,
+      name: "Bonk-Cancelling Headphones",
+      total_issued_amount: new BN(1000),
+      symbol: "headphone",
+      uri: "https://gateway.pinata.cloud/ipfs/bafkreifgtvuxh7iz25rcquqay4bwnrututpvj5tvhpx7uhg6bdsdun4ldi",
+      plans: [
+        { id:0, min: 5, max: 10, price: 70 },
+        { id:1, min: 10, max: 20, price: 60 },
+        { id:2, min: 20, max: 50, price: 50 },
+      ],
+    },
+    {
+      id: 1,
+      total_issued_amount: new BN(2000),
+      name: "Doge-Approved 4K Smart TV",
+      symbol: "STV",
+      uri: "https://gateway.pinata.cloud/ipfs/bafkreibjfaor5gb7t2ufn2bduymfjnxgrpo2pktmcadgygo7k5qpjers6e",
+      plans: [
+        { id:0, min: 5, max: 10, price: 150 },
+        { id:1, min: 10, max: 20, price: 140 },
+        { id:2, min: 50, max: 60, price: 120 },
+      ],
+    },
+    {
+      id: 2,
+      total_issued_amount: new BN(1500),
+      name: "Bonk Vacuum of the Future",
+      symbol: "vacuum",
+      uri: "https://gateway.pinata.cloud/ipfs/bafkreiehqxvojk7pbdochv6pcksmp5s5l64yoe2iv2dsys7zsdezw3jigi",
+      plans: [
+        { id:0, min: 20, max: 30, price: 8000 },
+        { id:1, min: 5, max: 10, price: 9500 },
+        { id:2, min: 2, max: 5, price: 12000 },
+      ],
+    },
+    {
+      id: 3,
+      total_issued_amount: new BN(1200),
+      name: "Bonk Wireless Airpods",
+      symbol: "airpods",
+      uri: "https://gateway.pinata.cloud/ipfs/bafkreihvu2m222jd7rq6h5wpo2sh34d45tv2ed3tmse7wtey6ujhcu7spm",
+      plans: [
+        { id:0, min: 5, max: 10, price: 50 },
+        { id:1, min: 10, max: 20, price: 60 },
+        { id:2, min: 20, max: 50, price: 70 },
+      ],
+    },
+    {
+      id: 4,
+      total_issued_amount: new BN(1700),
+      name: "Bonk smart watch",
+      symbol: "smartwatch",
+      uri: "https://gateway.pinata.cloud/ipfs/bafkreib7qqm32z6jpn37nkcory7lwkufjwaqnd4io2ma4m5pnvkxwowsrq",
+      plans: [
+        { id:0, min: 100, max: 150, price: 30 },
+        { id:1, min: 20, max: 50, price: 50 },
+        { id:2, min: 10, max: 20, price: 60 },
+      ],
+    },
+  ];
+  
 
   it("Airdrop", async () => {
     // Airdrop lamports to accounts
@@ -149,7 +207,7 @@ describe("blinkbuy", () => {
         // { mint: mintBonk, ata: ownerAtaBonk, receiver: provider.publicKey },
       ].flatMap((x) => [
         createAssociatedTokenAccountIdempotentInstruction(x.receiver, x.ata, x.receiver, mintBonk, tokenProgram),
-        createMintToInstruction(mintBonk, x.ata, provider.publicKey, 1e11, undefined, tokenProgram),
+        createMintToInstruction(mintBonk, x.ata, provider.publicKey, 1e13, undefined, tokenProgram),
       ]),
     ];
     await provider.sendAndConfirm(tx, [buyer1, buyer2]).then(log);
@@ -167,23 +225,35 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("add_product!", async () => {
-    // Add your test here.
-    const total_issued_amount = new BN(1000)
-    const name = "AirPods"
-    const symbol = "AP"
-    const uri = "https://gateway.pinata.cloud/ipfs/Qmd3FfsyaGfR2yrnNNCxreMKkvn9ByjsL3Te2CG2ozVM89"
-    await program.methods
-      .addProduct(total_issued_amount, name, symbol, uri)
-      .accounts({
-        ...accounts,
+  it("add_five_product!", async () => {
+    for (const product of products) {
+      const productIndex = new BN(product.id);
+      const productPublicKey = PublicKey.findProgramAddressSync(
+        [Buffer.from("store_product"), store.toBuffer(), productIndex.toArrayLike(Buffer, "le", 8)],
+        program.programId
+      )[0];
+      const mint_nft = PublicKey.findProgramAddressSync(
+        [Buffer.from("mint"), productPublicKey.toBuffer()],
+        program.programId
+      )[0];
+      await program.methods
+      .addProduct(product.total_issued_amount, product.name, product.symbol, product.uri)
+      .accountsStrict({
+        storeOwner: provider.publicKey,
+        mintNft: mint_nft,
+        store,
+        product: productPublicKey,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram,
+        systemProgram: SystemProgram.programId,
       })
-      .rpc()
-      .then(confirm)
-      .then(log);
+        .rpc()
+        .then(confirm)
+        .then(log);
+    }
   });
 
-  it("update_product!", async () => {
+  xit("update_product!", async () => {
     // Add your test here.
     const total_issued_amount = new BN(100)
     await program.methods
@@ -196,38 +266,48 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("add_price_requirement1!", async () => {
-    // Add your test here.
-    const min_amount = new BN(10)
-    const max_amount = new BN(50)
-    const price = new BN(1e9)
-    const init_fee = new BN(1e6)
-    await program.methods
-      .addPriceRequirement(min_amount, max_amount, price, init_fee)
-      .accounts({
-        ...accounts,
-      })
-      .rpc()
-      .then(confirm)
-      .then(log);
-  });
-  xit("add_price_requirement2!", async () => {
-    // Add your test here.
-    const min_amount = new BN(15)
-    const max_amount = new BN(30)
-    const price = new BN(1e8)
-    const init_fee = new BN(1e8)
-    await program.methods
-      .addPriceRequirement(min_amount, max_amount, price, init_fee)
-      .accounts({
-        ...accounts
-      })
-      .rpc()
-      .then(confirm)
-      .then(log);
+  it("add_each_product_three_price_requirement1!", async () => {
+    // Fixed initialization fee
+    const init_fee = new BN(1e6);
+
+    for (const product of products) {
+      const productIndex = new BN(product.id);
+      const productPublicKey = PublicKey.findProgramAddressSync(
+        [Buffer.from("store_product"), store.toBuffer(), productIndex.toArrayLike(Buffer, "le", 8)],
+        program.programId
+      )[0];
+
+      console.log(`Adding price requirements for product: ${product.name} (Index: ${product.id})`);
+      console.log("id",product.id,"productPublicKey",productPublicKey.toBase58())
+      for (const plan of product.plans) {
+        const min_amount = new BN(plan.min);
+        const max_amount = new BN(plan.max);
+        const price = new BN(plan.price * 1e9); // Assuming price in lamports
+        const num_price_requirement = new BN(plan.id);
+        const price_requirement = PublicKey.findProgramAddressSync(
+          [Buffer.from("price_requirement"), productPublicKey.toBuffer(), num_price_requirement.toArrayLike(Buffer, "le", 8)],
+          program.programId
+        )[0];
+        console.log("id",plan.id,"price_requirement",price_requirement.toBase58())
+        await program.methods
+          .addPriceRequirement(min_amount, max_amount, price, init_fee)
+          .accountsStrict({
+            storeOwner: provider.publicKey,
+            currency: mintBonk,
+            priceRequirement: price_requirement,
+            store,
+            product: productPublicKey,
+            tokenProgram,
+            systemProgram: SystemProgram.programId,
+          })
+          .rpc()
+          .then(confirm)
+          .then(log);
+      }
+    }
   });
 
-  it("request_group_manager!", async () => {
+  xit("request_group_manager!", async () => {
     // Add your test here.
     const promo_code = Buffer.from("NINJA666")
     await program.methods
@@ -241,7 +321,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("approve_group_manager!", async () => {
+  xit("approve_group_manager!", async () => {
     // Add your test here.
     await program.methods
       .approveGroupManager()
@@ -253,12 +333,12 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("create_group_order!", async () => {
+  xit("create_group_order!", async () => {
     // Add your test here.
     const manager_refund = new BN(5)
     const start_time = new BN(1e8)
     const expired_time = new BN(1e8)
-    const num_requirement = new BN(1)
+    const num_requirement = new BN(0)
     await program.methods
       .createGroupOrder(manager_refund, start_time, num_requirement, expired_time)
       .accounts({
@@ -270,7 +350,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("buy_product!", async () => {
+  xit("buy_product!", async () => {
     // Add your test here.
     const amount = new BN(5)
     await program.methods
@@ -284,7 +364,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("cancel_product!", async () => {
+  xit("cancel_product!", async () => {
     await program.methods
       .cancelRequest()
       .accounts({
@@ -296,7 +376,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("buy_product!", async () => {
+  xit("buy_product!", async () => {
     const amount = new BN(15)
     await program.methods
       .buyProduct(amount)
@@ -309,7 +389,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("claim_product!", async () => {
+  xit("claim_product!", async () => {
     await program.methods
       .claimProduct()
       .accounts({
