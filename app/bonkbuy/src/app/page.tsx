@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import Header from './components/header'
-import FeaturedDeals from './components/featured-deals'
+import Header from '../components/header'
+import FeaturedDeals from '../components/featured-deals'
 import { Sparkles } from 'lucide-react'
 
 export default function Home() {
@@ -55,7 +55,7 @@ function CallToAction() {
         </Link>
       </Button>
       <Button asChild size="lg" variant="outline" className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-6 rounded-full shadow-lg transform hover:scale-105 transition-transform">
-        <Link href="/trending-deals">Join Now</Link>
+        <Link href="/deal">Join Now</Link>
       </Button>
     </section>
   )

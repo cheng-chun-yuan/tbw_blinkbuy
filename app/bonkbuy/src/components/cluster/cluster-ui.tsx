@@ -3,10 +3,9 @@
 import { useConnection } from '@solana/wallet-adapter-react'
 import { IconTrash } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
-import { ReactNode, useState } from 'react'
-import { AppModal } from '../ui/ui-layout'
-import { ClusterNetwork, useCluster } from './cluster-data-access'
-import { Connection } from '@solana/web3.js'
+import { ReactNode } from 'react'
+import { useCluster } from './cluster-data-access'
+
 
 export function ExplorerLink({ path, label, className }: { path: string; label: string; className?: string }) {
   const { getExplorerUrl } = useCluster()
@@ -69,60 +68,6 @@ export function ClusterUiSelect() {
         ))}
       </ul>
     </div>
-  )
-}
-
-export function ClusterUiModal({ hideModal, show }: { hideModal: () => void; show: boolean }) {
-  const { addCluster } = useCluster()
-  const [name, setName] = useState('')
-  const [network, setNetwork] = useState<ClusterNetwork | undefined>()
-  const [endpoint, setEndpoint] = useState('')
-
-  return (
-    <AppModal
-      title={'Add Cluster'}
-      hide={hideModal}
-      show={show}
-      submit={() => {
-        try {
-          new Connection(endpoint)
-          if (name) {
-            addCluster({ name, network, endpoint })
-            hideModal()
-          } else {
-            console.log('Invalid cluster name')
-          }
-        } catch {
-          console.log('Invalid cluster endpoint')
-        }
-      }}
-      submitLabel="Save"
-    >
-      <input
-        type="text"
-        placeholder="Name"
-        className="input input-bordered w-full"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Endpoint"
-        className="input input-bordered w-full"
-        value={endpoint}
-        onChange={(e) => setEndpoint(e.target.value)}
-      />
-      <select
-        className="select select-bordered w-full"
-        value={network}
-        onChange={(e) => setNetwork(e.target.value as ClusterNetwork)}
-      >
-        <option value={undefined}>Select a network</option>
-        <option value={ClusterNetwork.Devnet}>Devnet</option>
-        <option value={ClusterNetwork.Testnet}>Testnet</option>
-        <option value={ClusterNetwork.Mainnet}>Mainnet</option>
-      </select>
-    </AppModal>
   )
 }
 

@@ -1,5 +1,6 @@
 import { CreateGroupPurchase } from '@/components/create-group-purchase'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function CreateGroupPurchasePage() {
   return (
@@ -18,6 +19,13 @@ export default function CreateGroupPurchasePage() {
         <p className="text-orange-600 mt-2">Wow! Such deals! Very group buy!</p>
       </div>
       <CreateGroupPurchase />
+      <div className="text-center mt-8">
+        <Link href="/" passHref>
+          <span className="inline-block bg-orange-700 text-white py-2 px-4 rounded-md hover:bg-orange-800">
+            Back to Home
+          </span>
+        </Link>
+      </div>
     </div>
   )
 }
