@@ -26,7 +26,7 @@ import { type Blinkbuy} from "@/app/idl/blinkbuy";
 
 const params = {
   title: 'AirPods - Elevate Your Audio Experience',
-  icon:'/airpods.png',
+  icon:'/airpods.webp',
   description: "Click to mint your NFT and own premium AirPods now!",
   label: "AirPods - Mint Now!"
 }
