@@ -25,10 +25,10 @@ import BlinkbuyJson from "@/app/idl/blinkbuy.json";
 import { type Blinkbuy} from "@/app/idl/blinkbuy";
 
 const params = {
-  title: '',
-  icon:'/nft.png',
-  description: "Simple click to mint your NFT.",
-  label: "Mint XueDAO NFT"
+  title: 'AirPods - Elevate Your Audio Experience',
+  icon:'/airpods.png',
+  description: "Click to mint your NFT and own premium AirPods now!",
+  label: "AirPods - Mint Now!"
 }
 
 export const GET = (req: Request, { param }: { param: { grouporder: string } },) => {
