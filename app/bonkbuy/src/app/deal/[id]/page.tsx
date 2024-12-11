@@ -184,4 +184,4 @@ export default function DealPage({ params }: { params: { id: string } }) {
     </section>
   );
 }
-// export const runtime = 'edge' // 'nodejs' (default) | 'edge'
+export const runtime = 'edge' // 'nodejs' (default) | 'edge'
