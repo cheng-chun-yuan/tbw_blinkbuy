@@ -43,7 +43,7 @@ impl AddPriceRequirement<'_> {
             product_id: self.product.key(),
             min_amount,
             max_amount,
-            num_requirement: self.product.num_product,
+            num_requirement: self.product.num_requirement,
             price,
             currency: self.currency.key(),
             init_fee,

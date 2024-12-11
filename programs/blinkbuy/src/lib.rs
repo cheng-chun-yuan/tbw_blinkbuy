@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("53cF82S7Q4VFiqAfSdbUdKbs5A5oD72efpZ8GUqsZvkX");
+declare_id!("2QSB1xHQD67cyWV88U9EyXPoaJVredoCX7PrZSdSwkzm");
 
 #[program]
 pub mod blinkbuy {
@@ -39,8 +39,8 @@ pub mod blinkbuy {
         ctx.accounts.approve_group_manager()
     }
 
-    pub fn create_group_order(ctx: Context<CreateGroupOrder>, manager_refund: u64, start_time: u64, num_requirement: u64, expired_time: u64) -> Result<()> {
-        ctx.accounts.create_group_order(manager_refund, start_time, num_requirement, expired_time, &ctx.bumps)
+    pub fn create_group_order(ctx: Context<CreateGroupOrder>, manager_refund: u64, start_time: u64, expired_time: u64) -> Result<()> {
+        ctx.accounts.create_group_order(manager_refund, start_time, expired_time, &ctx.bumps)
     }
 
     pub fn buy_product(ctx: Context<BuyProduct>, amount: u64) -> Result<()> {

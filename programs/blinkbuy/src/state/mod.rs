@@ -51,6 +51,7 @@ pub struct GroupManagerCertificate {
 #[derive(InitSpace)]
 pub struct GroupOrder {
     pub manager: Pubkey,
+    pub num_product: u64,
     pub num_requirement: u64,
     pub group_manager_certificate: Pubkey,
     pub current_amount: u64,

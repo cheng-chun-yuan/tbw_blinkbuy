@@ -46,12 +46,13 @@ pub struct CreateGroupOrder<'info> {
 }
 
 impl CreateGroupOrder<'_> {
-    pub fn create_group_order(&mut self, manager_refund: u64, start_time: u64, num_requirement: u64, expired_time: u64, bumps: &CreateGroupOrderBumps) -> Result<()> {
+    pub fn create_group_order(&mut self, manager_refund: u64, start_time: u64, expired_time: u64, bumps: &CreateGroupOrderBumps) -> Result<()> {
         let price = self.price_requirement.price * ( 100 + manager_refund ) / 100;
         self.group_order.set_inner( GroupOrder {
             num_order: self.group_manager_certificate.num_order,
             manager: self.manager.key(),
-            num_requirement,
+            num_product: self.product.num_product,
+            num_requirement: self.price_requirement.num_requirement,
             group_manager_certificate: self.group_manager_certificate.key(),
             current_amount: 0,
             manager_refund,
@@ -64,6 +65,7 @@ impl CreateGroupOrder<'_> {
             bump: bumps.group_order,
         });
         self.product.reserved_amount += self.price_requirement.max_amount;
+        self.group_manager_certificate.num_order += 1;
         Ok(())
     }
 }

@@ -40,9 +40,11 @@ describe("blinkbuy", () => {
 
   const mintBonk = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
 
-  const [buyer1, buyer2, manager] = Array.from({ length: 3 }, () =>
+  const [buyer1, buyer2] = Array.from({ length: 2 }, () =>
     Keypair.generate()
   );
+
+  const manager = provider.publicKey;
 
   const confirm = async (signature: string): Promise<string> => {
     const block = await connection.getLatestBlockhash();
@@ -60,23 +62,28 @@ describe("blinkbuy", () => {
     return signature;
   };
 
+  const productIndex = new BN(0)
+  const orderIndex = new BN(3)
+  const num_price_requirement = new BN(0);
+
   const store = PublicKey.findProgramAddressSync(
     [Buffer.from("store"), provider.publicKey.toBuffer()],
     program.programId
   )[0];
-  const productIndex = new BN(0)
+
   const product = PublicKey.findProgramAddressSync(
     [Buffer.from("store_product"), store.toBuffer(), productIndex.toArrayLike(Buffer, "le", 8)],
     program.programId
   )[0];
+  console.log(product.toBase58())
   const group_manager_certificate = PublicKey.findProgramAddressSync(
-    [Buffer.from("store"), store.toBuffer(), manager.publicKey.toBuffer()],
+    [Buffer.from("store"), store.toBuffer(), manager.toBuffer()],
     program.programId
   )[0];
+  console.log(group_manager_certificate.toBase58())
 
-  const orderIndex = new BN(0)
   const group_order = PublicKey.findProgramAddressSync(
-    [Buffer.from("group_order"), manager.publicKey.toBuffer(), orderIndex.toArrayLike(Buffer, "le", 8)],
+    [Buffer.from("group_order"), manager.toBuffer(), orderIndex.toArrayLike(Buffer, "le", 8)],
     program.programId
   )[0];
   const group_request = PublicKey.findProgramAddressSync(
@@ -94,9 +101,8 @@ describe("blinkbuy", () => {
   // const product = new PublicKey("C71kMwhtEBtvwcR96PvbU8CvJbw1k9WAkpoZ1sVm1H55")
   const buyer1AtaBonk = getAssociatedTokenAddressSync(mintBonk, buyer1.publicKey, false, tokenProgram)
   const buyer2AtaBonk = getAssociatedTokenAddressSync(mintBonk, buyer2.publicKey, false, tokenProgram)
-  const num_price_requirement1 = new BN(0);
-  const price_requirement1 = PublicKey.findProgramAddressSync(
-    [Buffer.from("price_requirement"), product.toBuffer(), num_price_requirement1.toArrayLike(Buffer, "le", 8)],
+  const price_requirement = PublicKey.findProgramAddressSync(
+    [Buffer.from("price_requirement"), product.toBuffer(), num_price_requirement.toArrayLike(Buffer, "le", 8)],
     program.programId
   )[0];
   const mint_nft = PublicKey.findProgramAddressSync(
@@ -109,13 +115,13 @@ describe("blinkbuy", () => {
     storeOwner: provider.publicKey,
     store,
     product,
-    manager: manager.publicKey,
+    manager: manager,
     currency: mintBonk,
-    tokenProgram,
     groupManagerCertificate: group_manager_certificate,
     groupOrder: group_order,
     groupRequest: group_request,
-    priceRequirement: price_requirement1,
+    priceRequirement: price_requirement,
+    tokenProgram,
     associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
     systemProgram: SystemProgram.programId
   }
@@ -183,11 +189,11 @@ describe("blinkbuy", () => {
   ];
   
 
-  it("Airdrop", async () => {
+  xit("Airdrop", async () => {
     // Airdrop lamports to accounts
     const airdropTx = new Transaction();
     airdropTx.add(
-      ...[manager, buyer1, buyer2].map((account) =>
+      ...[buyer1, buyer2].map((account) =>
         SystemProgram.transfer({
           fromPubkey: provider.publicKey,
           toPubkey: account.publicKey,
@@ -198,7 +204,7 @@ describe("blinkbuy", () => {
     await provider.sendAndConfirm(airdropTx, []).then(log);
   });
 
-  it("Airdrop All Token", async () => {
+  xit("Airdrop All Token", async () => {
     let tx = new Transaction();
     tx.instructions = [
       ...[
@@ -213,7 +219,7 @@ describe("blinkbuy", () => {
     await provider.sendAndConfirm(tx, [buyer1, buyer2]).then(log);
   });
 
-  it("Create Store!", async () => {
+  xit("Create Store!", async () => {
     // Add your test here.
     await program.methods
       .createStore()
@@ -225,7 +231,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("add_five_product!", async () => {
+  xit("add_five_product!", async () => {
     for (const product of products) {
       const productIndex = new BN(product.id);
       const productPublicKey = PublicKey.findProgramAddressSync(
@@ -266,7 +272,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("add_each_product_three_price_requirement1!", async () => {
+  xit("add_each_product_three_price_requirement1!", async () => {
     // Fixed initialization fee
     const init_fee = new BN(1e6);
 
@@ -315,7 +321,7 @@ describe("blinkbuy", () => {
       .accounts({
         ...accounts
       })
-      .signers([manager])
+      // .signers([manager])
       .rpc()
       .then(confirm)
       .then(log);
@@ -333,18 +339,21 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  xit("create_group_order!", async () => {
+  it("create_group_order!", async () => {
     // Add your test here.
+    const productList = await program.account.storeProduct.all()
+    console.log("productList", productList)
+    const group_require = await program.account.priceRequirement.all()
+    console.log("group_require",group_require)
     const manager_refund = new BN(5)
-    const start_time = new BN(1e8)
-    const expired_time = new BN(1e8)
-    const num_requirement = new BN(0)
+    const start_time = new BN(1733853000)
+    const expired_time = new BN(1736853000)
     await program.methods
-      .createGroupOrder(manager_refund, start_time, num_requirement, expired_time)
+      .createGroupOrder(manager_refund, start_time, expired_time)
       .accounts({
         ...accounts
       })
-      .signers([manager])
+      // .signers([manager])
       .rpc()
       .then(confirm)
       .then(log);
@@ -352,7 +361,7 @@ describe("blinkbuy", () => {
 
   xit("buy_product!", async () => {
     // Add your test here.
-    const amount = new BN(5)
+    const amount = new BN(2)
     await program.methods
       .buyProduct(amount)
       .accounts({
@@ -377,7 +386,7 @@ describe("blinkbuy", () => {
   });
 
   xit("buy_product!", async () => {
-    const amount = new BN(15)
+    const amount = new BN(5)
     await program.methods
       .buyProduct(amount)
       .accounts({
