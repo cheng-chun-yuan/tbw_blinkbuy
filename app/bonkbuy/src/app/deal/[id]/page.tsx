@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, ChevronLeft, Link } from "lucide-react";
+import { Clock, Users, ChevronLeft, Link, Copy } from "lucide-react";
 import {
   PublicKey,
   SystemProgram,
@@ -27,6 +27,7 @@ export default function DealPage({ params }: { params: { id: string } }) {
 
   // Find the deal based on the provided ID
   // const deal = mockDeals.find((d) => d.id === parseInt(id));
+  const [copied, setCopied] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [deal, setDeal] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -70,9 +71,18 @@ export default function DealPage({ params }: { params: { id: string } }) {
     }
 
     fetchDeal();
-  },[id, wallet, connection]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[id, connection]);
   const maxAvailable = deal ? deal.maximum - deal.progress : 0;
-
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareableLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
   const handleBuyNow = async () => {
     if (!program || !wallet) return 
     if (quantity < 1 || quantity > maxAvailable) {
@@ -177,10 +187,22 @@ export default function DealPage({ params }: { params: { id: string } }) {
           <Clock className="mr-1 h-4 w-4 text-yellow-600" />
           {deal.timeRemaining}
         </span>
-        <a href={shareableLink} target="_blank" rel="noopener noreferrer" className="flex items-center text-yellow-600">
+        <a 
+          href={`http://twitter.com/share?text=${shareableLink}`} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="flex items-center text-yellow-600 hover:text-yellow-700"
+        >
           <Link className="mr-1 h-4 w-4" />
-          Share
+          Share on Twitter
         </a>
+        <Button 
+          onClick={handleCopyLink} 
+          className="flex items-center text-yellow-600 hover:text-yellow-700"
+        >
+          <Copy className="mr-1 h-4 w-4" />
+          {copied ? 'Copied!' : 'Copy Link'}
+        </Button>
       </div>
 
       <div className="flex justify-between text-sm mb-6">
