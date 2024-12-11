@@ -11,7 +11,7 @@ import { ChevronRight, ChevronLeft, Bone } from 'lucide-react';
 import Image from 'next/image';
 import { dealsData } from '@/lib/utils';
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { Program, Idl, AnchorProvider, setProvider } from "@coral-xyz/anchor";
+import { Program, AnchorProvider, setProvider } from "@coral-xyz/anchor";
 import BlinkbuyJson from "@/app/idl/blinkbuy.json";
 import { type Blinkbuy} from "@/app/idl/blinkbuy";
 import { PublicKey, SystemProgram } from '@solana/web3.js';

@@ -9,7 +9,7 @@ import {
   clusterApiUrl,
   Connection,
 } from "@solana/web3.js";
-import { Program, BN } from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
 import { dealsData } from '@/lib/utils'
 
 import BlinkbuyJson from "@/app/idl/blinkbuy.json";

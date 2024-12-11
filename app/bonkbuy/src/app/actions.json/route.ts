@@ -5,8 +5,8 @@ export const GET = async () => {
     rules: [
       // map all root level routes to an action
       {
-        pathPattern: "/buy/[group_order]/*",
-        apiPath: "/api/buy/[group_order]/*",
+        pathPattern: "/buy/*",
+        apiPath: "/api/buy/*",
       },
     ],
   };

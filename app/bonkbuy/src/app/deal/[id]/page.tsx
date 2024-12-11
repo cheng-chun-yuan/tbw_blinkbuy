@@ -6,13 +6,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Users, ChevronLeft } from "lucide-react";
-import {useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
+import { Clock, Users, ChevronLeft, Link } from "lucide-react";
 import {
   PublicKey,
   SystemProgram,
 } from "@solana/web3.js";
-import { Program, BN } from "@coral-xyz/anchor";
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import { Program, BN,  AnchorProvider, setProvider } from "@coral-xyz/anchor";
 import BlinkbuyJson from "@/app/idl/blinkbuy.json";
 import { type Blinkbuy} from "@/app/idl/blinkbuy";
 import {
@@ -30,9 +30,13 @@ export default function DealPage({ params }: { params: { id: string } }) {
   const [quantity, setQuantity] = useState(1);
   const [deal, setDeal] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { connection } = useConnection()
-  const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
-  const wallet = useAnchorWallet()
+  const [shareableLink, setShareableLink] = useState('');
+  const { connection } = useConnection();
+  const wallet = useAnchorWallet();
+  if (!wallet) return 
+  const provider = new AnchorProvider(connection, wallet  , {});
+  setProvider(provider);
+  const program = new Program(BlinkbuyJson as Blinkbuy, provider);
   const group_order_account = new PublicKey(id);
   useEffect(() => {
     async function fetchDeal() {
@@ -40,9 +44,11 @@ export default function DealPage({ params }: { params: { id: string } }) {
         const group_order = await program.account.groupOrder.fetch(group_order_account);
         const dealData = dealsData[Number(group_order.numProduct)];
         const plan = dealData.plans[Number(group_order.numRequirement)];
-        
+        const link = `https://dial.to/?action=solana-action:https://tbw-blinkbuy.pages.dev/api/buy/${group_order_account.toString()}`;
+        setShareableLink(link);
         setDeal({
           name: dealData.name,
+          price: Number(group_order.price)/1e6,
           description: dealData.description,
           image: dealData.image,
           progress: Number(group_order.currentAmount),
@@ -61,7 +67,7 @@ export default function DealPage({ params }: { params: { id: string } }) {
     }
 
     fetchDeal();
-  }, [id]);
+  },[id, wallet, connection]);
   const maxAvailable = deal ? deal.maximum - deal.progress : 0;
 
   // Handle "Buy Now" functionality
@@ -70,8 +76,6 @@ export default function DealPage({ params }: { params: { id: string } }) {
       alert("Invalid quantity selected.");
       return;
     }
-    if(!wallet) return ;
-    if(!wallet.publicKey) return ;
     const mintBonk = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
     const group_request = PublicKey.findProgramAddressSync(
       [Buffer.from("group_request"), group_order_account.toBuffer(), wallet.publicKey.toBuffer()],
@@ -93,23 +97,40 @@ export default function DealPage({ params }: { params: { id: string } }) {
         systemProgram: SystemProgram.programId
       })
       .rpc()
+
     console.log(`Purchasing ${quantity} units of ${deal?.name}`);
     // You can redirect to a checkout page or process the purchase here
   };
 
   // Handle case where deal is not found
   if (!deal) {
-    return (
-      <div className="text-center text-yellow-500 py-20">
-        <h1 className="text-4xl font-bold">Deal Not Found</h1>
-        <button
-          onClick={() => router.push("/")}
-          className="text-yellow-300 underline mt-4"
-        >
-          Go Back to Deals
-        </button>
-      </div>
-    );
+    if (loading){
+      return (
+        <div className="text-center text-yellow-500 py-20">
+          <h1 className="text-4xl font-bold">Loading ...</h1>
+          <button
+            onClick={() => router.push("/")}
+            className="text-yellow-300 underline mt-4"
+          >
+            Go Back to Deals
+          </button>
+        </div>
+      );
+    }
+    else {
+      return (
+        <div className="text-center text-yellow-500 py-20">
+          <h1 className="text-4xl font-bold">Deal Not Found</h1>
+          <button
+            onClick={() => router.push("/")}
+            className="text-yellow-300 underline mt-4"
+          >
+            Go Back to Deals
+          </button>
+        </div>
+      );
+    }
+
   }
   return (
     <section className="max-w-4xl mx-auto bg-yellow-100 bg-opacity-90 backdrop-blur-lg rounded-lg p-6 shadow-lg text-yellow-700">
@@ -153,6 +174,16 @@ export default function DealPage({ params }: { params: { id: string } }) {
           <Clock className="mr-1 h-4 w-4 text-yellow-600" />
           {deal.timeRemaining}
         </span>
+        <a href={shareableLink} target="_blank" rel="noopener noreferrer" className="flex items-center text-yellow-600">
+          <Link className="mr-1 h-4 w-4" />
+          Share
+        </a>
+      </div>
+
+      <div className="flex justify-between text-sm mb-6">
+        <span className="flex items-center font-bold text-lg text-yellow-800">
+          {deal.price.toLocaleString()} BONK
+        </span>
       </div>
 
       {/* Quantity Input and Buy Now Button */}
@@ -184,4 +215,4 @@ export default function DealPage({ params }: { params: { id: string } }) {
     </section>
   );
 }
-export const runtime = 'edge' // 'nodejs' (default) | 'edge'
+// export const runtime = 'edge' // 'nodejs' (default) | 'edge'
