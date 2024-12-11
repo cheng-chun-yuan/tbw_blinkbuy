@@ -52,12 +52,10 @@ function getDescription({
   return `
     Group Order Details:
     - Manager: ${managerAddress}
-    - Current Progress: ${current} items purchased
+    - Current Progress: ${current} / ${min} items (max: ${max})
     - Start Time: ${start}
     - Expiry Time: ${expiry}
-    - Minimum Order Requirement: ${min} items
-    - Maximum Order Capacity: ${max} items
-    - Price per Item: ${priceValue} BONK
+    - Price: ${priceValue} BONK
   `;
 }
 const productParams = [

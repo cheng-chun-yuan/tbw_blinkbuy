@@ -47,7 +47,7 @@ export default function DealPage({ params }: { params: { id: string } }) {
         const group_order = await program.account.groupOrder.fetch(group_order_account);
         const dealData = dealsData[Number(group_order.numProduct)];
         const plan = dealData.plans[Number(group_order.numRequirement)];
-        const link = `https://dial.to/?action=solana-action:https://tbw-blinkbuy.pages.dev/api/buy/${group_order_account.toString()}`;
+        const link = `https://dial.to/?action=solana-action:https://tbw-blinkbuy.pages.dev/api/buy/${group_order_account.toString()}&cluster=devnet`;
         setShareableLink(link);
         setDeal({
           name: dealData.name,
