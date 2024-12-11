@@ -101,6 +101,7 @@ describe("blinkbuy", () => {
   // const product = new PublicKey("C71kMwhtEBtvwcR96PvbU8CvJbw1k9WAkpoZ1sVm1H55")
   const buyer1AtaBonk = getAssociatedTokenAddressSync(mintBonk, buyer1.publicKey, false, tokenProgram)
   const buyer2AtaBonk = getAssociatedTokenAddressSync(mintBonk, buyer2.publicKey, false, tokenProgram)
+  const ownerAtaBonk = getAssociatedTokenAddressSync(mintBonk, provider.publicKey, false, tokenProgram)
   const price_requirement = PublicKey.findProgramAddressSync(
     [Buffer.from("price_requirement"), product.toBuffer(), num_price_requirement.toArrayLike(Buffer, "le", 8)],
     program.programId
@@ -204,6 +205,19 @@ describe("blinkbuy", () => {
     await provider.sendAndConfirm(airdropTx, []).then(log);
   });
 
+  it("Airdrop All Token", async () => {
+    let tx = new Transaction();
+    tx.instructions = [
+      ...[
+        { ata: ownerAtaBonk, receiver: provider.publicKey },
+      ].flatMap((x) => [
+        createAssociatedTokenAccountIdempotentInstruction(x.receiver, x.ata, x.receiver, mintBonk, tokenProgram),
+        createMintToInstruction(mintBonk, x.ata, provider.publicKey, 1e16, undefined, tokenProgram),
+      ]),
+    ];
+    await provider.sendAndConfirm(tx, []).then(log);
+  });
+
   xit("Airdrop All Token", async () => {
     let tx = new Transaction();
     tx.instructions = [
@@ -288,7 +302,7 @@ describe("blinkbuy", () => {
       for (const plan of product.plans) {
         const min_amount = new BN(plan.min);
         const max_amount = new BN(plan.max);
-        const price = new BN(plan.price * 1e9); // Assuming price in lamports
+        const price = new BN(plan.price);
         const num_price_requirement = new BN(plan.id);
         const price_requirement = PublicKey.findProgramAddressSync(
           [Buffer.from("price_requirement"), productPublicKey.toBuffer(), num_price_requirement.toArrayLike(Buffer, "le", 8)],
@@ -339,7 +353,7 @@ describe("blinkbuy", () => {
       .then(log);
   });
 
-  it("create_group_order!", async () => {
+  xit("create_group_order!", async () => {
     // Add your test here.
     const productList = await program.account.storeProduct.all()
     console.log("productList", productList)

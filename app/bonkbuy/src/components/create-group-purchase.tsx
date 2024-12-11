@@ -55,7 +55,7 @@ export function CreateGroupPurchase() {
   };
 
   const handlePublish = async () => {
-    const manager_refund = new BN(5)
+    const manager_refund = new BN(0)
     const startTimestamp = Math.floor(new Date(groupPurchase.startTime).getTime() / 1000)
     console.log(startTimestamp)
     const start_time = new BN(startTimestamp)
