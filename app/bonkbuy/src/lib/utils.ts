@@ -14,6 +14,8 @@ export const dealsData = [
     maxprice: 70,
     productPublicKey: "Cug1HN893gNm9o5DHGxAcn6gZEGBWsNzxQfdAKQ7bVxE",
     tag: "🔥 Hot Deal",
+    details:
+      "These headphones are equipped with bonk-level noise cancellation technology to block out distractions. Perfect for focusing on your music or work.",
     plans: [
       { id: 0, min: 5, max: 10, price: 70, price_requirement: "Cymgd75S6L8gMnHAGzF9QLqZHLmSvK9fo3GLvY2wLifA"},
       { id: 1, min: 10, max: 20, price: 60, price_requirement: "GCLrBCJMGzDbRgoEioUmAf83JAiKT4VmKnzqStgWzmcS" },
@@ -29,6 +31,8 @@ export const dealsData = [
     maxprice: 150,
     productPublicKey: "21iPKb6vYaut5CD63FvZ3NLedgE5bKd4VypsQL6KVB8a",
     tag: "👀 Almost Gone",
+    details:
+      "Experience stunning visuals with this Doge-Approved 4K Smart TV. With cutting-edge HDR support, every detail comes to life.",
     plans: [
       { id: 0, min: 5, max: 10, price: 150, price_requirement: "JDAcx7BLpECdzgws3Rm6xxEuuGYDxbXmaBPrC8DcgKKy" },
       { id: 1, min: 10, max: 20, price: 140, price_requirement: "JDgHh2Yvr8P7VHEUNn3pXRukcS2FMTTdAfTsDjkf6GKh" },
@@ -44,6 +48,8 @@ export const dealsData = [
     maxprice: 12000,
     productPublicKey: "Ed1H8STxNakZrxjZjozLmyCriRGSc1UrPTRg4iS2FNNf",
     tag: "🆕 Just Launched",
+    details:
+      "The Bonk Vacuum of the Future comes with AI-powered cleaning and multi-surface compatibility for effortless cleaning.",
     plans: [
       { id: 0, min: 20, max: 30, price: 8000, price_requirement: "FCvhgGwgVd9EPqPp9EhHaNQzPXPcQdNhZPh9rpMch8Sz" },
       { id: 1, min: 5, max: 10, price: 9500, price_requirement: "BQ37yzVawkpJoF6j2RyhtNhbHdhmYGVcU4rSiXbohUBX"  },
@@ -59,6 +65,8 @@ export const dealsData = [
     maxprice: 70,
     productPublicKey: "Cz3ENAdv6dhgpusMz5ZNb4qUCwxErq4GfwUHcj4ufneh",
     tag: "🆕 Just Launched",
+    details:
+      "Wireless, seamless, and crystal-clear sound! These Bonk Wireless Airpods redefine your listening experience.",
     plans: [
       { id: 0, min: 5, max: 10, price: 50, price_requirement: "EeiMHDbSQEZohSkYc9Ed8XQTEb5heQUqzuT1GeK5qCJT" },
       { id: 1, min: 10, max: 20, price: 60, price_requirement: "5aRePtvV8B2g2KsJuP7vAwJ4Dj31jfB6vDPXP9dWcMNw" },
@@ -74,6 +82,8 @@ export const dealsData = [
     maxprice: 60,
     productPublicKey: "C2QBvBZ5t47Bvya6Gh8GGbwTb4LFCoV1iiP7eJPgP39G",
     tag: "🆕 Just Launched",
+    details:
+      "Track your life with style! The Bonk Smart Watch combines cutting-edge technology with sleek design for the ultimate wearable experience.",
     plans: [
       { id: 0, min: 100, max: 150, price: 30, price_requirement: "HgcLuxgeeKGAKqLtgyfxnARd9Wh9dN2QCpB8WJHGyo4Z" },
       { id: 1, min: 20, max: 50, price: 50, price_requirement: "5MaKKKnaE5tP37Rgp7raBVPVPgkftsyqZHLUmp68Xfm" },

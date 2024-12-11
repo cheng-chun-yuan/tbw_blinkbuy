@@ -21,7 +21,6 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { dealsData } from "@/lib/utils";
-
 export default function DealPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
