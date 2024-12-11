@@ -11,7 +11,6 @@ import {
   Connection,
   PublicKey,
   Transaction,
-  Keypair,
 } from "@solana/web3.js";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -94,17 +93,32 @@ const productParams = [
   }
 ];
 
-const connection = new Connection( clusterApiUrl('devnet'), {
-  commitment: "confirmed",
-});
-const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
 
 export const GET = async (req: Request) => {
-
+  const connection = new Connection( process.env.SOLANA_CONNECTION_URL || clusterApiUrl('devnet'), {
+    commitment: "confirmed",
+  });
+  const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
 
   const { searchParams } = new URL(req.url);
-  const group_order_param = searchParams.get('grouporder') || "default";
-  const group_order = new PublicKey(group_order_param);
+  const group_order_param = searchParams.get('grouporder');
+  
+  if (!group_order_param) {
+    return new Response('Missing grouporder parameter', {
+      status: 400,
+      headers: ACTIONS_CORS_HEADERS,
+    });
+  }
+
+  let group_order: PublicKey;
+  try {
+    group_order = new PublicKey(group_order_param);
+  } catch (err) {
+    return new Response('Invalid grouporder parameter', {
+      status: 400,
+      headers: ACTIONS_CORS_HEADERS,
+    });
+  }
 
   const group_order_data = await program.account.groupOrder.fetch(group_order)
   const {
@@ -164,6 +178,10 @@ export const GET = async (req: Request) => {
 export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
+  const connection = new Connection( process.env.SOLANA_CONNECTION_URL || clusterApiUrl('devnet'), {
+    commitment: "confirmed",
+  });
+  const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
   try {
     const body: ActionPostRequest = await req.json();
     // Validate to confirm the user publickey received is valid before use
