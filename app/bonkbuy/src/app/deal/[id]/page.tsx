@@ -33,14 +33,17 @@ export default function DealPage({ params }: { params: { id: string } }) {
   const [shareableLink, setShareableLink] = useState('');
   const { connection } = useConnection();
   const wallet = useAnchorWallet();
-  if (!wallet) return 
-  const provider = new AnchorProvider(connection, wallet  , {});
-  setProvider(provider);
-  const program = new Program(BlinkbuyJson as Blinkbuy, provider);
+  const provider = wallet ? new AnchorProvider(connection, wallet, {}) : null;
+  if (provider) {
+    setProvider(provider);
+  }
+  const program = provider ? new Program(BlinkbuyJson as Blinkbuy, provider) : null;
   const group_order_account = new PublicKey(id);
+
   useEffect(() => {
     async function fetchDeal() {
       try {
+        if (!program) return 
         const group_order = await program.account.groupOrder.fetch(group_order_account);
         const dealData = dealsData[Number(group_order.numProduct)];
         const plan = dealData.plans[Number(group_order.numRequirement)];
@@ -70,8 +73,8 @@ export default function DealPage({ params }: { params: { id: string } }) {
   },[id, wallet, connection]);
   const maxAvailable = deal ? deal.maximum - deal.progress : 0;
 
-  // Handle "Buy Now" functionality
   const handleBuyNow = async () => {
+    if (!program || !wallet) return 
     if (quantity < 1 || quantity > maxAvailable) {
       alert("Invalid quantity selected.");
       return;
