@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/blinkbuy.json`.
  */
 export type Blinkbuy = {
-  "address": "53cF82S7Q4VFiqAfSdbUdKbs5A5oD72efpZ8GUqsZvkX",
+  "address": "2QSB1xHQD67cyWV88U9EyXPoaJVredoCX7PrZSdSwkzm",
   "metadata": {
     "name": "blinkbuy",
     "version": "0.1.0",
@@ -1287,10 +1287,6 @@ export type Blinkbuy = {
           "type": "u64"
         },
         {
-          "name": "numRequirement",
-          "type": "u64"
-        },
-        {
           "name": "expiredTime",
           "type": "u64"
         }
@@ -1686,6 +1682,10 @@ export type Blinkbuy = {
           {
             "name": "manager",
             "type": "pubkey"
+          },
+          {
+            "name": "numProduct",
+            "type": "u64"
           },
           {
             "name": "numRequirement",

@@ -1,88 +1,26 @@
 'use client';
-import { useAnchorWallet} from '@solana/wallet-adapter-react'
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { useToast } from "@/hooks/use-toast"
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronRight, ChevronLeft, Bone } from 'lucide-react';
 import Image from 'next/image';
-
+import { dealsData } from '@/lib/utils';
+import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
+import { Program, Idl, AnchorProvider, setProvider } from "@coral-xyz/anchor";
+import BlinkbuyJson from "@/app/idl/blinkbuy.json";
+import { type Blinkbuy} from "@/app/idl/blinkbuy";
+import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { BN } from 'bn.js';
 
 // Predefined Products and Plans
-const predefinedProducts = [
-  {
-    id: 0,
-    productPublicKey: "3d7w1o6Xvhf4MQN7Ah1FkSFR7KYC7z4ctUF2xf2qbL4M",
-    name: "Bonk-Cancelling Headphones",
-    minprice: 50,
-    maxprice: 70,
-    image: "/headphone.webp",
-    plans: [
-      { id: 1, min: 5, max: 10, price: 70, price_requirement: "9Un2KYAjsGYAgJj8BDZcSkt4stE2Lcscy6nkCNYnYodi"},
-      { id: 2, min: 10, max: 20, price: 60, price_requirement: "GaLMGbcQEajQBXD92j3WEWexJ3xQU3QrAEXCvQgyAa2y" },
-      { id: 3, min: 20, max: 50, price: 50, price_requirement: "4Q2C7BGzqF1q79UtWABuyDpEDfa74PVP7yN2NGo9wsjp" },
-    ],
-  },
-  {
-    id: 1,
-    productPublicKey: "9XJ4ZUpMcHS1rXL6HNdatgEVgNvCGiMmKHNdP8h56wLx",
-    name: "Doge-Approved 4K Smart TV",
-    minprice: 120,
-    maxprice: 150,
-    image: "/smartTV.webp",
-    plans: [
-      { id: 1, min: 5, max: 10, price: 150, price_requirement: "D1ksk9iD5APzkFFk1ExZ8gpGuLRFFwTqpn8M553Xdg6J" },
-      { id: 2, min: 10, max: 20, price: 140, price_requirement: "Chkp6MxtyVh5L7Bv9t8zLTajiiaR1HoGbPGAxX387df2" },
-      { id: 3, min: 50, max: 60, price: 120, price_requirement: "GjzwCpGb6jaMdPgYvtU8jujgNvK4UuoDgGTsUsCwgP9z" },
-    ],
-  },
-  {
-    id: 2,
-    productPublicKey: "741y9KUM99YXwMaNm4cLge7y42p1eRQ3Xoc8BX6SZX3P",
-    name: "Doge-Approved 4K Smart TV",
-    minprice: 8000,
-    maxprice: 12000,
-    image: "/smartTV.webp",
-    plans: [
-      { id: 1, min: 20, max: 30, price: 8000, price_requirement: "52Rn3VENfVCEujftWw2no4ev6ddrfrN1ZBYmzaAj3b9n" },
-      { id: 2, min: 5, max: 10, price: 9500, price_requirement: "ArVUz3rigzp2o1f813dWvCCZR9eMrCBxjNuVHDPrSbdb"  },
-      { id: 3, min: 2, max: 5, price: 12000, price_requirement: "3t7XiohCjVbzF9HkezUqoavkmtQDjsc53YgM9dDiAjyy"  },
-    ],
-  },
-  {
-    id: 3,
-    productPublicKey: "62tyXkgyYehAwMJDwBn7XMWxjBvA44XbCPyaQx95fTJX",
-    name: "Bonk Vacuum of the Future",
-    minprice: 50,
-    maxprice: 70,
-    image: "/vacuum.webp",
-    plans: [
-      { id: 1, min: 5, max: 10, price: 50, price_requirement: "8yqB3Ln5vnMBRSzdGUMtgEMADVEkQgn1zNECxPf9MLzj" },
-      { id: 2, min: 10, max: 20, price: 60, price_requirement: "rqFqCjVyr6pEvjZ6SH7DLZoUsYPkr4EJBofUn2bdrEu" },
-      { id: 3, min: 20, max: 50, price: 70, price_requirement: "E3bGpjLF1nVSJdzECHBu9ekv2QwozQX5WP9zzdQAbsBR" },
-    ],
-  },
-  {
-    id: 4,
-    productPublicKey: "GUjYxGGjKnWF7FvnuRgfnGULwrAezDeqDkP84sL9sEAB",
-    name: "Bonk Wireless Airpods",
-    minprice: 30,
-    maxprice: 60,
-    image: "/airpods.webp",
-    plans: [
-      { id: 1, min: 100, max: 150, price: 30, price_requirement: "5Rj3p2cNrHNhd9WUYL3AAzBbRchGi5eitfScBPawFeNZ" },
-      { id: 2, min: 20, max: 50, price: 50, price_requirement: "G5kk42ytDP4dviiTrWk4V89M9DKcj654gLVPaQUhzbRU" },
-      { id: 3, min: 10, max: 20, price: 60, price_requirement: "6uY5qj7oF2RBCBin8g4i8fmDww4HaX2UmYrTWwsfDiL5" },
-    ],
-  },
-];
-
-
+const predefinedProducts = dealsData
 
 export function CreateGroupPurchase() {
-  const wallet = useAnchorWallet()
   const [step, setStep] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState(predefinedProducts[0]);
   const [selectedPlan, setSelectedPlan] = useState(selectedProduct.plans[0]);
@@ -91,16 +29,72 @@ export function CreateGroupPurchase() {
     duration: 24,
   });
   const [shareableLink, setShareableLink] = useState('');
+  const { toast } = useToast()
+  const { connection } = useConnection();
+  const wallet = useAnchorWallet();
+  if (!wallet) return 
+  const provider = new AnchorProvider(connection, wallet  , {});
+  setProvider(provider);
+  const program = new Program(BlinkbuyJson as Blinkbuy, provider);
 
   const handleNext = () => setStep((prev) => Math.min(prev + 1, 4));
   const handlePrev = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleGenerateLink = () => {
-    const link = `https://example.com/group-purchase/${Math.random().toString(36).substring(7)}`;
-    setShareableLink(link);
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareableLink);
+      toast({
+        description: "Link copied to clipboard!",
+      });
+    } catch (err) {
+      toast({
+        description: "Failed to copy link.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePublish = async () => {
+    const manager_refund = new BN(5)
+    const startTimestamp = Math.floor(new Date(groupPurchase.startTime).getTime() / 1000)
+    console.log(startTimestamp)
+    const start_time = new BN(startTimestamp)
+    const expired_time = new BN(startTimestamp+ groupPurchase.duration * 3600)
+    const priceRequirement = new PublicKey(selectedPlan.price_requirement)
+    const product = new PublicKey(selectedProduct.productPublicKey)
+    const storeOwner= new PublicKey("FSPvMFYQqPsYyhoLAtmj4fc6vNp5UWteviSPcKr9KnQ5")
+    const store = PublicKey.findProgramAddressSync(
+      [Buffer.from("store"), storeOwner.toBuffer()],
+      program.programId
+    )[0];
+    const groupManagerCertificate = PublicKey.findProgramAddressSync(
+      [Buffer.from("store"), store.toBuffer(), wallet.publicKey.toBuffer()],
+      program.programId
+    )[0];
+    const group_manager_certificate = await program.account.groupManagerCertificate.fetch(groupManagerCertificate)
+    const orderIndex = new BN(group_manager_certificate.numOrder)
+    const groupOrder = PublicKey.findProgramAddressSync(
+      [Buffer.from("group_order"), wallet.publicKey.toBuffer(), orderIndex.toArrayLike(Buffer, "le", 8)],
+      program.programId
+    )[0];
+    const success = await program.methods
+      .createGroupOrder(manager_refund, start_time, expired_time)
+      .accountsStrict({
+        manager: wallet.publicKey,
+        storeOwner,
+        product,
+        priceRequirement,
+        store,
+        groupManagerCertificate,
+        groupOrder,
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc()
+    toast({
+      description: "Your purchase has been sent successful.",
+    })
+    const link = `https://dial.to/?action=solana-action:http://localhost:3000/api/buy/${groupOrder.toString()}`;
+    setShareableLink(link);
   };
 
   return (
@@ -222,7 +216,7 @@ export function CreateGroupPurchase() {
         {step === 4 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">4. Generate and Share Link</h3>
-            <Button onClick={handleGenerateLink} className="w-full">Generate Shareable Link</Button>
+            <Button onClick={handleCopyLink} disabled={shareableLink==''} className="w-full">Copy Shareable Link</Button>
             {shareableLink && (
               <div className="mt-4 p-4 bg-gray-100 rounded-md">
                 <p><strong>Shareable Link:</strong> <a href={shareableLink} className="text-blue-500 underline">{shareableLink}</a></p>

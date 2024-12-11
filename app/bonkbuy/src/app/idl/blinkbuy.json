@@ -1,5 +1,5 @@
 {
-  "address": "53cF82S7Q4VFiqAfSdbUdKbs5A5oD72efpZ8GUqsZvkX",
+  "address": "2QSB1xHQD67cyWV88U9EyXPoaJVredoCX7PrZSdSwkzm",
   "metadata": {
     "name": "blinkbuy",
     "version": "0.1.0",
@@ -1281,10 +1281,6 @@
           "type": "u64"
         },
         {
-          "name": "num_requirement",
-          "type": "u64"
-        },
-        {
           "name": "expired_time",
           "type": "u64"
         }
@@ -1680,6 +1676,10 @@
           {
             "name": "manager",
             "type": "pubkey"
+          },
+          {
+            "name": "num_product",
+            "type": "u64"
           },
           {
             "name": "num_requirement",

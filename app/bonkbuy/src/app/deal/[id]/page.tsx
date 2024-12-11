@@ -2,96 +2,98 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, ChevronLeft } from "lucide-react";
-
-// Mock Deals Data
-const mockDeals = [
-  {
-    id: 0,
-    name: "Bonk-Cancelling Headphones",
-    description: "Silence the cats, embrace the bonks! 🎧🐕",
-    image: "/headphone.webp",
-    progress: 40,
-    target: 50,
-    maximum: 70,
-    timeRemaining: "2d 5h",
-    tag: "🔥 Hot Deal",
-    details:
-      "These headphones are equipped with bonk-level noise cancellation technology to block out distractions. Perfect for focusing on your music or work.",
-  },
-  {
-    id: 1,
-    name: "Doge-Approved 4K Smart TV",
-    description: "So sharp, you can see the moon from here! 📺🌕",
-    image: "/smartTV.webp",
-    progress: 75,
-    target: 100,
-    maximum: 120,
-    timeRemaining: "4d 12h",
-    tag: "👀 Almost Gone",
-    details:
-      "Experience stunning visuals with this Doge-Approved 4K Smart TV. With cutting-edge HDR support, every detail comes to life.",
-  },
-  {
-    id: 2,
-    name: "Bonk Vacuum of the Future",
-    description: "It bonks the dirt away! 🤖🐾",
-    image: "/vacuum.webp",
-    progress: 30,
-    target: 80,
-    maximum: 100,
-    timeRemaining: "1d 8h",
-    tag: "🆕 Just Launched",
-    details:
-      "The Bonk Vacuum of the Future comes with AI-powered cleaning and multi-surface compatibility for effortless cleaning.",
-  },
-  {
-    id: 3,
-    name: "Bonk Wireless Airpods",
-    description: "Listen to the world! 🤖🐾",
-    image: "/airpods.webp",
-    progress: 200,
-    target: 180,
-    maximum: 250,
-    timeRemaining: "1d 8h",
-    tag: "🎧 New Arrival",
-    details:
-      "Wireless, seamless, and crystal-clear sound! These Bonk Wireless Airpods redefine your listening experience.",
-  },
-  {
-    id: 4,
-    name: "Bonk smart watch",
-    description: "Bring you the future technology! 🤖🐾",
-    image: "/smartwatch.webp",
-    progress: 200,
-    target: 180,
-    maximum: 250,
-    timeRemaining: "1d 8h",
-    tag: "🆕 Just Launched",
-    details:
-      "Track your life with style! The Bonk Smart Watch combines cutting-edge technology with sleek design for the ultimate wearable experience.",
-  },
-];
+import {useConnection, useAnchorWallet} from '@solana/wallet-adapter-react'
+import {
+  PublicKey,
+  SystemProgram,
+} from "@solana/web3.js";
+import { Program, BN } from "@coral-xyz/anchor";
+import BlinkbuyJson from "@/app/idl/blinkbuy.json";
+import { type Blinkbuy} from "@/app/idl/blinkbuy";
+import {
+  TOKEN_2022_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
+import { dealsData } from "@/lib/utils";
 
 export default function DealPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
 
   // Find the deal based on the provided ID
-  const deal = mockDeals.find((d) => d.id === parseInt(id));
+  // const deal = mockDeals.find((d) => d.id === parseInt(id));
   const [quantity, setQuantity] = useState(1);
+  const [deal, setDeal] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const { connection } = useConnection()
+  const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
+  const wallet = useAnchorWallet()
+  const group_order_account = new PublicKey(id);
+  useEffect(() => {
+    async function fetchDeal() {
+      try {
+        const group_order = await program.account.groupOrder.fetch(group_order_account);
+        const dealData = dealsData[Number(group_order.numProduct)];
+        const plan = dealData.plans[Number(group_order.numRequirement)];
+        
+        setDeal({
+          name: dealData.name,
+          description: dealData.description,
+          image: dealData.image,
+          progress: Number(group_order.currentAmount),
+          details: dealData.details,
+          target: plan.min,
+          maximum: plan.max,
+          timeRemaining: "2d 5h",
+          group_order: id,
+          tag: dealData.tag,
+        });
+      } catch (error) {
+        console.error('Error fetching deal:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDeal();
+  }, [id]);
   const maxAvailable = deal ? deal.maximum - deal.progress : 0;
 
   // Handle "Buy Now" functionality
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (quantity < 1 || quantity > maxAvailable) {
       alert("Invalid quantity selected.");
       return;
     }
+    if(!wallet) return ;
+    if(!wallet.publicKey) return ;
+    const mintBonk = new PublicKey("Aqk2sTGwLuojdYSHDLCXgidGNUQeskWS2JbKXPksHdaG")
+    const group_request = PublicKey.findProgramAddressSync(
+      [Buffer.from("group_request"), group_order_account.toBuffer(), wallet.publicKey.toBuffer()],
+      program.programId
+    )[0];
+    const buyerAta = getAssociatedTokenAddressSync(mintBonk, wallet.publicKey, false, TOKEN_2022_PROGRAM_ID)
+    const vaultGroupOrder = getAssociatedTokenAddressSync(mintBonk, group_order_account, true, TOKEN_2022_PROGRAM_ID)
+    await program.methods
+      .buyProduct(new BN(quantity))
+      .accountsStrict({
+        buyer: wallet.publicKey,
+        currency: mintBonk,
+        groupOrder: group_order_account,
+        buyerAta,
+        vaultGroupOrder,
+        groupRequest: group_request,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId
+      })
+      .rpc()
     console.log(`Purchasing ${quantity} units of ${deal?.name}`);
     // You can redirect to a checkout page or process the purchase here
   };
@@ -183,4 +185,4 @@ export default function DealPage({ params }: { params: { id: string } }) {
     </section>
   );
 }
-export const runtime = 'edge' // 'nodejs' (default) | 'edge'
+// export const runtime = 'edge' // 'nodejs' (default) | 'edge'

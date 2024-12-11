@@ -4,3 +4,80 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+export const dealsData = [
+  {
+    id: 0,
+    name: "Bonk-Cancelling Headphones",
+    description: "Silence the cats, embrace the bonks! 🎧🐕",
+    image: "/headphone.webp",
+    minprice: 50,
+    maxprice: 70,
+    productPublicKey: "Cug1HN893gNm9o5DHGxAcn6gZEGBWsNzxQfdAKQ7bVxE",
+    tag: "🔥 Hot Deal",
+    plans: [
+      { id: 0, min: 5, max: 10, price: 70, price_requirement: "Cymgd75S6L8gMnHAGzF9QLqZHLmSvK9fo3GLvY2wLifA"},
+      { id: 1, min: 10, max: 20, price: 60, price_requirement: "GCLrBCJMGzDbRgoEioUmAf83JAiKT4VmKnzqStgWzmcS" },
+      { id: 2, min: 20, max: 50, price: 50, price_requirement: "GvKFkApvVfXeWuYRsXjMpvGubNAFsEqJs9L8XuVoxznt" },
+    ],
+  },
+  {
+    id: 1,
+    name: "Doge-Approved 4K Smart TV",
+    description: "So sharp, you can see the moon from here! 📺🌕",
+    image: "/smartTV.webp",
+    minprice: 120,
+    maxprice: 150,
+    productPublicKey: "21iPKb6vYaut5CD63FvZ3NLedgE5bKd4VypsQL6KVB8a",
+    tag: "👀 Almost Gone",
+    plans: [
+      { id: 0, min: 5, max: 10, price: 150, price_requirement: "JDAcx7BLpECdzgws3Rm6xxEuuGYDxbXmaBPrC8DcgKKy" },
+      { id: 1, min: 10, max: 20, price: 140, price_requirement: "JDgHh2Yvr8P7VHEUNn3pXRukcS2FMTTdAfTsDjkf6GKh" },
+      { id: 2, min: 50, max: 60, price: 120, price_requirement: "EScX6NnwTnyDpx5V5nYJb2v2yCTSayMcbY37dYDMKfFa" },
+    ],
+  },
+  {
+    id: 2,
+    name: "Bonk Vacuum of the Future",
+    description: "It bonks the dirt away! 🤖🐾",
+    image: "/vacuum.webp",
+    minprice: 8000,
+    maxprice: 12000,
+    productPublicKey: "Ed1H8STxNakZrxjZjozLmyCriRGSc1UrPTRg4iS2FNNf",
+    tag: "🆕 Just Launched",
+    plans: [
+      { id: 0, min: 20, max: 30, price: 8000, price_requirement: "FCvhgGwgVd9EPqPp9EhHaNQzPXPcQdNhZPh9rpMch8Sz" },
+      { id: 1, min: 5, max: 10, price: 9500, price_requirement: "BQ37yzVawkpJoF6j2RyhtNhbHdhmYGVcU4rSiXbohUBX"  },
+      { id: 2, min: 2, max: 5, price: 12000, price_requirement: "5zvQ9PPmanB7FiZhY1rjM7Ks6Jbu3BqCs3RGPmwe9AZZ"  },
+    ],
+  },
+  {
+    id: 3,
+    name: "Bonk Wireless Airpods",
+    description: "Listen to the world! 🤖🐾",
+    image: "/airpods.webp",
+    minprice: 50,
+    maxprice: 70,
+    productPublicKey: "Cz3ENAdv6dhgpusMz5ZNb4qUCwxErq4GfwUHcj4ufneh",
+    tag: "🆕 Just Launched",
+    plans: [
+      { id: 0, min: 5, max: 10, price: 50, price_requirement: "EeiMHDbSQEZohSkYc9Ed8XQTEb5heQUqzuT1GeK5qCJT" },
+      { id: 1, min: 10, max: 20, price: 60, price_requirement: "5aRePtvV8B2g2KsJuP7vAwJ4Dj31jfB6vDPXP9dWcMNw" },
+      { id: 2, min: 20, max: 50, price: 70, price_requirement: "44cKiY24WNucUHfhrxJqeDiyfLR44aHWywPpNA97Tqse" },
+    ],
+  },
+  {
+    id: 4,
+    name: "Bonk smart watch",
+    description: "Bring you the future technology! 🤖🐾",
+    image: "/smartwatch.webp",
+    minprice: 30,
+    maxprice: 60,
+    productPublicKey: "C2QBvBZ5t47Bvya6Gh8GGbwTb4LFCoV1iiP7eJPgP39G",
+    tag: "🆕 Just Launched",
+    plans: [
+      { id: 0, min: 100, max: 150, price: 30, price_requirement: "HgcLuxgeeKGAKqLtgyfxnARd9Wh9dN2QCpB8WJHGyo4Z" },
+      { id: 1, min: 20, max: 50, price: 50, price_requirement: "5MaKKKnaE5tP37Rgp7raBVPVPgkftsyqZHLUmp68Xfm" },
+      { id: 2, min: 10, max: 20, price: 60, price_requirement: "HQoBMzDZFkTCcHFnCh1Zd742jh4F1beoeye5LASs5pP3" },
+    ],
+  },
+]

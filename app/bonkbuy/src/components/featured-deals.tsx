@@ -1,67 +1,68 @@
+"use client"
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Users } from 'lucide-react'
+import {
+  clusterApiUrl,
+  Connection,
+} from "@solana/web3.js";
+import { Program, BN } from "@coral-xyz/anchor";
+import { dealsData } from '@/lib/utils'
 
+import BlinkbuyJson from "@/app/idl/blinkbuy.json";
+import { type Blinkbuy} from "@/app/idl/blinkbuy";
 export default function FeaturedDeals() {
-  const deals = [
-    {
-      id: 0,
-      name: "Bonk-Cancelling Headphones",
-      description: "Silence the cats, embrace the bonks! 🎧🐕",
-      image: "/headphone.webp",
-      progress: 40,
-      target: 50,
-      maximum: 70,
-      timeRemaining: "2d 5h",
-      tag: "🔥 Hot Deal",
-    },
-    {
-      id: 1,
-      name: "Doge-Approved 4K Smart TV",
-      description: "So sharp, you can see the moon from here! 📺🌕",
-      image: "/smartTV.webp",
-      progress: 75,
-      target: 100,
-      maximum: 120,
-      timeRemaining: "4d 12h",
-      tag: "👀 Almost Gone",
-    },
-    {
-      id: 2,
-      name: "Bonk Vacuum of the Future",
-      description: "It bonks the dirt away! 🤖🐾",
-      image: "/vacuum.webp",
-      progress: 30,
-      target: 80,
-      maximum: 100,
-      timeRemaining: "1d 8h",
-      tag: "🆕 Just Launched",
-    },
-    {
-      id: 3,
-      name: "Bonk Wireless Airpods",
-      description: "Listen to the world! 🤖🐾",
-      image: "/airpods.webp",
-      progress: 200,
-      target: 180,
-      maximum: 250,
-      timeRemaining: "1d 8h",
-      tag: "🆕 Just Launched",
-    },
-    {
-      id: 4,
-      name: "Bonk smart watch",
-      description: "Bring you the future technology! 🤖🐾",
-      image: "/smartwatch.webp",
-      progress: 200,
-      target: 180,
-      maximum: 250,
-      timeRemaining: "1d 8h",
-      tag: "🆕 Just Launched",
-    },
-  ]
+  
+  const [deals, setDeals] = useState<Array<{
+    id: number;
+    name: string;
+    description: string;
+    image: string;
+    progress: number;
+    target: number;
+    maximum: number;
+    timeRemaining: string;
+    group_order: string;
+    tag: string;
+  }>>([]);
+
+  useEffect(() => {
+    const fetchDeals = async () => {
+      const connection = new Connection(clusterApiUrl('devnet'), {
+        commitment: "confirmed",
+      });
+      const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
+      const group_orders = await program.account.groupOrder.all();
+      
+      const newDeals: typeof deals = [];
+      group_orders.forEach((group) => {
+        const group_order = group.account;
+        const dealData = dealsData[Number(group_order.numProduct)];
+        const plan = dealData.plans[Number(group_order.numRequirement)];
+        if (plan) {
+          newDeals.push({
+            id: newDeals.length,
+            name: dealData.name,
+            description: dealData.description,
+            image: dealData.image,
+            progress: Number(group_order.currentAmount),
+            target: plan.min,
+            maximum: plan.max,
+            timeRemaining: "2d 5h",
+            group_order: group.publicKey.toBase58(),
+            tag: dealData.tag,
+          });
+        }
+      });
+      
+      setDeals(newDeals);
+    };
+    fetchDeals();
+  }, []);
+
 
   return (
     <section>
@@ -69,8 +70,8 @@ export default function FeaturedDeals() {
         🚀 Trending Bonk Deals 🐕
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {deals.map((deal) => (
-          <Link href={`/deal/${deal.id}`} key={deal.id} className="block">
+      {deals.map((deal) => (
+          <Link href={`/deal/${deal.group_order}`} key={deal.group_order} className="block">
             <div className="bg-white bg-opacity-20 backdrop-blur-lg rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:scale-105 transition-transform">
               <div className="relative">
                 <Image
@@ -104,7 +105,7 @@ export default function FeaturedDeals() {
               </div>
             </div>
           </Link>
-        ))}
+      ))}
       </div>
     </section>
   )

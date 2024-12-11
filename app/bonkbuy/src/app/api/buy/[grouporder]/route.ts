@@ -24,13 +24,6 @@ import { Program, BN } from "@coral-xyz/anchor";
 import BlinkbuyJson from "@/app/idl/blinkbuy.json";
 import { type Blinkbuy} from "@/app/idl/blinkbuy";
 
-const params = {
-  title: 'AirPods - Elevate Your Audio Experience',
-  icon:'/airpods.webp',
-  description: "Click to mint your NFT and own premium AirPods now!",
-  label: "AirPods - Mint Now!"
-}
-
 function getDescription({
   currentAmount,
   startTime,
@@ -55,12 +48,11 @@ function getDescription({
   const min = minAmount.toString();
   const max = maxAmount.toString();
   const priceValue = (Number(price)/1e6).toString();
-  const managerAddress = manager.toString();
-
+  const managerAddress = manager.toBase58()
   // Construct the description
   return `
     Group Order Details:
-    - Manager: Albert
+    - Manager: ${managerAddress}
     - Current Progress: ${current} items purchased
     - Start Time: ${start}
     - Expiry Time: ${expiry}
@@ -69,7 +61,38 @@ function getDescription({
     - Price per Item: ${priceValue} BONK
   `;
 }
-
+const productParams = [
+  {
+    title: 'Bonk-Cancelling Headphones - Premium Audio Experience',
+    icon: '/headphone.webp',
+    description: "Click to join the group buy for Bonk-Cancelling Headphones!",
+    label: "Headphones - Buy Now!"
+  },
+  {
+    title: 'Doge-Approved 4K Smart TV - Crystal Clear Vision',
+    icon: '/smartTV.webp',
+    description: "Click to join the group buy for a premium 4K Smart TV!",
+    label: "Smart TV - Buy Now!"
+  },
+  {
+    title: 'Bonk Vacuum of the Future - Smart Cleaning',
+    icon: '/vacuum.webp',
+    description: "Click to join the group buy for the revolutionary Bonk Vacuum!",
+    label: "Vacuum - Buy Now!"
+  },
+  {
+    title: 'Bonk Wireless Airpods - Premium Sound',
+    icon: '/airpods.webp',
+    description: "Click to join the group buy for Wireless Airpods!",
+    label: "Airpods - Buy Now!"
+  },
+  {
+    title: 'Bonk Smart Watch - Future Technology',
+    icon: '/smartwatch.webp',
+    description: "Click to join the group buy for the innovative Smart Watch!",
+    label: "Smart Watch - Buy Now!"
+  }
+];
 const connection = new Connection(clusterApiUrl('devnet'), {
   commitment: "confirmed",
 });
@@ -85,8 +108,7 @@ export const GET = async (req: Request) => {
   const group_order_data = await program.account.groupOrder.fetch(group_order)
   const {
     manager,
-    numRequirement,
-    groupManagerCertificate,
+    numProduct,
     currentAmount,
     startTime,
     expiredTime,
@@ -95,15 +117,16 @@ export const GET = async (req: Request) => {
     price
   } = group_order_data;
   const description = getDescription({
+    manager,
     currentAmount,
     startTime,
     expiredTime,
     minAmount,
     maxAmount,
     price,
-    manager,
   });
-  
+  const params = productParams[Number(numProduct)]
+
   const payload: ActionGetResponse = {
     title: params.title,
     icon: new URL(
