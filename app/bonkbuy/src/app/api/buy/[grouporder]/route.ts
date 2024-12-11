@@ -93,7 +93,7 @@ const productParams = [
     label: "Smart Watch - Buy Now!"
   }
 ];
-const connection = new Connection(clusterApiUrl('devnet'), {
+const connection = new Connection(process.env.SOLANA_CONNECTION_URL || 'https://solana-devnet.g.alchemy.com/v2/y1zYW-ovVofq7OzZo0Z6IHenRnyq_Pbd', {
   commitment: "confirmed",
 });
 const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});

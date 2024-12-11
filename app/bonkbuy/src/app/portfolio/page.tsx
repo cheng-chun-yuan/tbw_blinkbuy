@@ -39,7 +39,7 @@ export default function MyOrdersPage() {
   }>>([]);
   useEffect(() => {
     const fetchDeals = async () => {
-      const connection = new Connection(clusterApiUrl('devnet'), {
+      const connection = new Connection(process.env.SOLANA_CONNECTION_URL || clusterApiUrl('devnet'), {
         commitment: "confirmed",
       });
       const program = new Program<Blinkbuy>(BlinkbuyJson as Blinkbuy, {connection});
