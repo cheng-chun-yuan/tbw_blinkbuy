@@ -93,7 +93,7 @@ export function CreateGroupPurchase() {
     toast({
       description: "Your purchase has been sent successful.",
     })
-    const link = `https://dial.to/?action=solana-action:http://localhost:3000/api/buy/${groupOrder.toString()}`;
+    const link = `https://dial.to/?action=solana-action:https://tbw-blinkbuy.pages.dev/api/buy/${groupOrder.toString()}`;
     setShareableLink(link);
   };
 
