@@ -4,7 +4,7 @@ import {
   SystemProgram,
 } from "@solana/web3.js";
 import { useAnchorWallet, useConnection } from "@solana/wallet-adapter-react";
-import { Program, BN,  AnchorProvider, setProvider } from "@coral-xyz/anchor";
+import { Program,  AnchorProvider, setProvider } from "@coral-xyz/anchor";
 import AnchorAirdropEscrowJson from "@/app/idl/anchor_airdrop_escrow.json";
 import { type AnchorAirdropEscrow} from "@/app/idl/anchor_airdrop_escrow";
 import {
