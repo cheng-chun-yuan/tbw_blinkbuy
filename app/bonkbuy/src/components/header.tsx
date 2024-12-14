@@ -1,7 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import { WalletButton } from "@/components/solana/solana-provider";
+import {Faucet} from "@/components/claim_faucet";
+
 
 export default function Header() {
   return (
@@ -20,7 +22,12 @@ export default function Header() {
           </span>
         </Link>
         <div className="flex items-center space-x-4">
-          <Button asChild variant="secondary" className="bg-yellow-400 text-black hover:bg-yellow-500">
+          <Faucet/>
+          <Button
+            asChild
+            variant="secondary"
+            className="bg-yellow-400 text-black hover:bg-yellow-500"
+          >
             <Link href="/portfolio">My Portfolio</Link>
           </Button>
           <WalletButton />

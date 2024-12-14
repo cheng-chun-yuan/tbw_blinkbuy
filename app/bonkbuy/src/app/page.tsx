@@ -1,9 +1,10 @@
+"use client"
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import Header from '../components/header'
 import FeaturedDeals from '../components/featured-deals'
 import { Sparkles } from 'lucide-react'
-
+import {Faucet} from '@/components/claim_faucet'
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500">
